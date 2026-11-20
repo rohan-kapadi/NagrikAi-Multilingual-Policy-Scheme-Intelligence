@@ -39,11 +39,12 @@ export const ListenButton: React.FC<ListenButtonProps> = ({ text, language = 'en
     }
 
     return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      // Only cancel synthesis if THIS button was the one speaking on unmount
+      if (isSpeaking && typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
+  }, [isSpeaking]);
 
   const getCleanSpeechText = (raw: string): string => {
     // Strip markdown formatting, symbols, bullet points, asterisks, URLs

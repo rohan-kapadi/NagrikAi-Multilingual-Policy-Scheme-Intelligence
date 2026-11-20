@@ -5,7 +5,10 @@ import type { CitizenProfile, SupportedLanguage } from './types';
 import { ChatWindow } from './components/ChatWindow';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ProfilePanel } from './components/ProfilePanel';
-import { UserCheck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { NoticeUpload } from './components/NoticeUpload';
+import { UserCheck, CheckCircle2, AlertCircle, MessageSquare, FileText } from 'lucide-react';
+
+type ActiveTab = 'chat' | 'notice';
 
 export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
@@ -14,6 +17,7 @@ export default function App() {
   const [lang, setLang] = useState<SupportedLanguage>('en');
   const [profile, setProfile] = useState<Partial<CitizenProfile>>({});
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('chat');
 
   const t = {
     en: {
@@ -118,13 +122,54 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Chat Interface */}
+      {/* Main area: tab bar + content */}
       <main className="flex-1 flex flex-col relative overflow-hidden">
-        <ChatWindow
-          language={lang}
-          profile={profile}
-          onProfileUpdate={(updated) => setProfile((prev) => ({ ...prev, ...updated }))}
-        />
+        {/* Tab bar */}
+        <div className="border-b border-slate-200 bg-white px-4">
+          <div className="max-w-4xl mx-auto flex space-x-1">
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`flex items-center space-x-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition-colors ${
+                activeTab === 'chat'
+                  ? 'border-emerald-600 text-emerald-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>
+                {lang === 'hi' ? 'योजना चैट' : lang === 'mr' ? 'योजना चॅट' : 'Scheme Chat'}
+              </span>
+            </button>
+            <button
+              onClick={() => setActiveTab('notice')}
+              className={`flex items-center space-x-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition-colors ${
+                activeTab === 'notice'
+                  ? 'border-emerald-600 text-emerald-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>
+                {lang === 'hi' ? 'नोटिस विश्लेषक' : lang === 'mr' ? 'नोटीस स्पष्टीकरण' : 'Notice Explainer'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Tab content */}
+        <div className="flex-1 overflow-hidden relative">
+          {activeTab === 'chat' ? (
+            <ChatWindow
+              language={lang}
+              profile={profile}
+              onProfileUpdate={(updated) => setProfile((prev) => ({ ...prev, ...updated }))}
+            />
+          ) : (
+            <div className="h-full overflow-y-auto">
+              <NoticeUpload language={lang} />
+            </div>
+          )}
+        </div>
 
         {/* Profile Side Drawer */}
         <ProfilePanel

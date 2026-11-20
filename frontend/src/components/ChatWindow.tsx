@@ -32,6 +32,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       clearChat: 'Reset Chat',
       welcomeTitle: 'Welcome to NagrikAI',
       welcomeDesc: 'Your personal civic intelligence guide for Indian government schemes and welfare policies.',
+      analyzing: 'NagrikAI is analyzing policies and schemes...',
     },
     hi: {
       placeholder: 'सरकारी योजनाओं, पात्रता या लाभों के बारे में पूछें...',
@@ -43,6 +44,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       clearChat: 'रीसेट करें',
       welcomeTitle: 'नागरिक AI में आपका स्वागत है',
       welcomeDesc: 'सरकारी योजनाओं, पात्रता और नीतियों के लिए आपका नागरिक मार्गदर्शक।',
+      analyzing: 'नागरिक AI नीतियों और योजनाओं का विश्लेषण कर रहा है...',
     },
     mr: {
       placeholder: 'सरकारी योजना, पात्रता किंवा लाभांबद्दल विचारा...',
@@ -54,6 +56,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
       clearChat: 'रीसेट करा',
       welcomeTitle: 'नागरिक AI मध्ये आपले स्वागत आहे',
       welcomeDesc: 'शासकीय योजना आणि कल्याणकारी धोरणांसाठी आपला वैयक्तिक मार्गदर्शक.',
+      analyzing: 'नागरिक AI धोरणे आणि योजनांचे विश्लेषण करत आहे...',
     },
   }[language];
 
@@ -176,7 +179,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         {loading && (
           <div className="flex items-center space-x-2 text-xs text-slate-500 py-3 pl-2">
             <div className="w-2 h-2 rounded-full bg-emerald-600 animate-ping" />
-            <span>NagrikAI is analyzing policies and schemes...</span>
+            <span>{t.analyzing}</span>
           </div>
         )}
         <div ref={messagesEndRef} />

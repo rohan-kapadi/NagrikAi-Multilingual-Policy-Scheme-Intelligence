@@ -58,10 +58,15 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
   useEffect(() => {
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
     if (!SpeechRecognition) {
       setIsSupported(false);
     }
+    // Cleanup: abort recognition on unmount (e.g. language switch or navigation)
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
   }, []);
 
   const startListening = () => {
