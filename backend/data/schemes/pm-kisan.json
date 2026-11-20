@@ -1,0 +1,92 @@
+{
+  "id": "pm-kisan",
+  "name": {
+    "en": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi) [TODO_VERIFY]",
+    "hi": "पीएम-किसान (प्रधानमंत्री किसान सम्मान निधि) [TODO_VERIFY]",
+    "mr": "पीएम-किसान (प्रधानमंत्री किसान सन्मान निधी) [TODO_VERIFY]"
+  },
+  "level": "central",
+  "state": null,
+  "category": ["agriculture"],
+  "summary": {
+    "en": "Central sector scheme providing income support of Rs 6,000 per year to landholding farmer families. [TODO_VERIFY]",
+    "hi": "भूमिधारक किसान परिवारों को प्रति वर्ष ₹6,000 की वित्तीय सहायता प्रदान करने वाली केंद्रीय योजना। [TODO_VERIFY]",
+    "mr": "जमीनधारक शेतकरी कुटुंबांना दरवर्षी ₹6,000 ची आर्थिक मदत देणारी केंद्र सरकारची योजना. [TODO_VERIFY]"
+  },
+  "benefits": {
+    "en": "Direct financial benefit of Rs 6,000 per year transferred in three equal installments of Rs 2,000 directly into bank accounts. [TODO_VERIFY]",
+    "hi": "प्रति वर्ष ₹6,000 का प्रत्यक्ष लाभ, ₹2,000 की तीन समान किस्तों में सीधे बैंक खाते में। [TODO_VERIFY]",
+    "mr": "दरवर्षी ₹6,000 चा थेट लाभ, ₹2,000 च्या तीन समान हप्त्यांमध्ये थेट बँक खात्यात. [TODO_VERIFY]"
+  },
+  "criteria": [
+    {
+      "id": "c1",
+      "label": {
+        "en": "Occupation must be farmer",
+        "hi": "व्यवसाय किसान होना चाहिए",
+        "mr": "व्यवसाय शेतकरी असावा"
+      },
+      "field": "occupation",
+      "op": "eq",
+      "value": "farmer",
+      "source_ref": "pm_kisan_guidelines_p2"
+    },
+    {
+      "id": "c2",
+      "label": {
+        "en": "Must own cultivable agricultural land (hectares > 0)",
+        "hi": "खेती योग्य भूमि का स्वामित्व होना चाहिए (हेक्टेयर > 0)",
+        "mr": "लागवडीयोग्य शेतजमिनीची मालकी असावी (हेक्टर > 0)"
+      },
+      "field": "land_holding_hectares",
+      "op": "gt",
+      "value": 0,
+      "source_ref": "pm_kisan_guidelines_p3"
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "e1",
+      "label": {
+        "en": "High family income exclusion (income > 10000000) [TODO_VERIFY]",
+        "hi": "उच्च पारिवारिक आय अपवर्जन (आय > 10000000) [TODO_VERIFY]",
+        "mr": "उच्च कौटुंबिक उत्पन्न अपवर्जन (उत्पन्न > 10000000) [TODO_VERIFY]"
+      },
+      "field": "annual_family_income",
+      "op": "gt",
+      "value": 10000000,
+      "source_ref": "pm_kisan_guidelines_p4"
+    }
+  ],
+  "required_documents": [
+    {
+      "en": "Aadhaar Card linked with bank account",
+      "hi": "बैंक खाते से जुड़ा आधार कार्ड",
+      "mr": "बँक खात्याशी जोडलेले आधार कार्ड"
+    },
+    {
+      "en": "Land ownership documents / 7/12 extract or Jamabandi",
+      "hi": "भूमि स्वामित्व दस्तावेज / 7/12 उतारा या जमाबंदी",
+      "mr": "जमीन मालकी दस्तऐवज / 7/12 उतारा किंवा जमाबंदी"
+    },
+    {
+      "en": "Active bank account passbook details",
+      "hi": "सक्रिय बैंक खाता पासबुक विवरण",
+      "mr": "सक्रिय बँक खाते पासबुक तपशील"
+    }
+  ],
+  "how_to_apply": {
+    "en": "Apply online at pmkisan.gov.in under 'Farmers Corner' or visit the nearest Common Service Centre (CSC).",
+    "hi": "pmkisan.gov.in पर 'फार्मर्स कॉर्नर' के अंतर्गत ऑनलाइन आवेदन करें या नजदीकी कॉमन सर्विस सेंटर (CSC) पर जाएं।",
+    "mr": "pmkisan.gov.in वरील 'फार्मर्स कॉर्नर' अंतर्गत ऑनलाइन अर्ज करा किंवा जवळच्या सीएससी (CSC) केंद्राला भेट द्या."
+  },
+  "official_url": "https://pmkisan.gov.in",
+  "source_documents": [
+    {
+      "title": "PM-KISAN Operational Guidelines",
+      "url": "https://pmkisan.gov.in/Documents/OperationalGuidelines.pdf",
+      "retrieved_on": "2026-11-20"
+    }
+  ],
+  "verified": false
+}

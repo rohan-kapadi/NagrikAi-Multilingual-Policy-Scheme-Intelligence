@@ -1,0 +1,96 @@
+{
+  "id": "post-matric-scholarship",
+  "name": {
+    "en": "Post-Matric Scholarship Scheme [TODO_VERIFY]",
+    "hi": "पोस्ट-मैट्रिक छात्रवृत्ति योजना [TODO_VERIFY]",
+    "mr": "मॅट्रिकोत्तर शिष्यवृत्ती योजना [TODO_VERIFY]"
+  },
+  "level": "central",
+  "state": null,
+  "category": ["education", "scholarship"],
+  "summary": {
+    "en": "Centrally sponsored scholarship for students pursuing post-secondary / post-matric education. [TODO_VERIFY]",
+    "hi": "कक्षा 10 के बाद उच्च शिक्षा प्राप्त कर रहे छात्रों के लिए केंद्र प्रायोजित छात्रवृत्ति योजना। [TODO_VERIFY]",
+    "mr": "इयत्ता 10वीनंतर उच्च शिक्षण घेणाऱ्या विद्यार्थ्यांसाठी केंद्र पुरस्कृत शिष्यवृत्ती योजना. [TODO_VERIFY]"
+  },
+  "benefits": {
+    "en": "Compulsory non-refundable fees reimbursement and monthly maintenance allowance depending on course type. [TODO_VERIFY]",
+    "hi": "अनिवार्य गैर-वापसी योग्य शैक्षणिक शुल्क प्रतिपूर्ति और मासिक निर्वाह भत्ता। [TODO_VERIFY]",
+    "mr": "अनिवार्य शैक्षणिक फी परतावा आणि अभ्यासक्रमानुसार मासिक निर्वाह भत्ता. [TODO_VERIFY]"
+  },
+  "criteria": [
+    {
+      "id": "c1",
+      "label": {
+        "en": "Occupation must be student",
+        "hi": "व्यवसाय छात्र होना चाहिए",
+        "mr": "व्यवसाय विद्यार्थी असावा"
+      },
+      "field": "occupation",
+      "op": "eq",
+      "value": "student",
+      "source_ref": "scholarship_guidelines_p1"
+    },
+    {
+      "id": "c2",
+      "label": {
+        "en": "Annual family income must not exceed Rs 2,50,000 [TODO_VERIFY]",
+        "hi": "पारिवारिक वार्षिक आय ₹2,50,000 से अधिक नहीं होनी चाहिए [TODO_VERIFY]",
+        "mr": "कौटुंबिक वार्षिक उत्पन्न ₹2,50,000 पेक्षा जास्त नसावे [TODO_VERIFY]"
+      },
+      "field": "annual_family_income",
+      "op": "lte",
+      "value": 250000,
+      "source_ref": "scholarship_guidelines_p2"
+    },
+    {
+      "id": "c3",
+      "label": {
+        "en": "Must have passed Class 10 (education_level in class_12, graduate, postgraduate)",
+        "hi": "कक्षा 10 उत्तीर्ण होना चाहिए (शिक्षा स्तर 12वीं, स्नातक, या स्नातकोत्तर)",
+        "mr": "इयत्ता 10वी उत्तीर्ण असावी (शिक्षण 12वी, पदवी किंवा पदव्युत्तर)"
+      },
+      "field": "education_level",
+      "op": "in",
+      "value": ["class_12", "graduate", "postgraduate"],
+      "source_ref": "scholarship_guidelines_p3"
+    }
+  ],
+  "exclusions": [],
+  "required_documents": [
+    {
+      "en": "Class 10 mark sheet and previous year passing certificate",
+      "hi": "कक्षा 10 की अंकतालिका और पिछले वर्ष का उत्तीर्ण प्रमाण पत्र",
+      "mr": "10वी गुणपत्रिका आणि मागील वर्षाचे उत्तीर्ण प्रमाणपत्र"
+    },
+    {
+      "en": "Income Certificate issued by competent revenue authority (Tahsildar/SDM)",
+      "hi": "सक्षम राजस्व अधिकारी द्वारा जारी आय प्रमाण पत्र",
+      "mr": "सक्षम महसूल अधिकाऱ्याने दिलेला उत्पन्नाचा दाखला"
+    },
+    {
+      "en": "Current year college admission fee receipt & ID card",
+      "hi": "वर्तमान वर्ष कॉलेज प्रवेश शुल्क रसीद और पहचान पत्र",
+      "mr": "चालू वर्षाची महाविद्यालयीन प्रवेश पावती आणि ओळखपत्र"
+    },
+    {
+      "en": "Aadhaar seeded bank account passbook copy",
+      "hi": "आधार लिंक बैंक खाता पासबुक प्रति",
+      "mr": "आधार लिंक बँक खाते पासबुक प्रत"
+    }
+  ],
+  "how_to_apply": {
+    "en": "Register and submit application online on the National Scholarship Portal (scholarships.gov.in).",
+    "hi": "राष्ट्रीय छात्रवृत्ति पोर्टल (scholarships.gov.in) पर ऑनलाइन पंजीकरण और आवेदन प्रस्तुत करें।",
+    "mr": "नॅशनल स्कॉलरशिप पोर्टलवर (scholarships.gov.in) ऑनलाइन नोंदणी आणि अर्ज सादर करा."
+  },
+  "official_url": "https://scholarships.gov.in",
+  "source_documents": [
+    {
+      "title": "Post-Matric Scholarship Scheme Guidelines",
+      "url": "https://scholarships.gov.in/public/schemeGuidelines/PostMatricGuidelines.pdf",
+      "retrieved_on": "2026-11-20"
+    }
+  ],
+  "verified": false
+}
