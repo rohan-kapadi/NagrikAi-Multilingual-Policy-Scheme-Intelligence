@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, RotateCcw } from 'lucide-react';
 import type { ChatMessage, CitizenProfile, SupportedLanguage } from '../types';
 import { MessageBubble } from './MessageBubble';
+import { VoiceButton } from './VoiceButton';
 import { sendChatMessage, resetSessionProfile } from '../lib/api';
 
 interface ChatWindowProps {
@@ -196,6 +197,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
             onChange={(e) => setInputText(e.target.value)}
             placeholder={t.placeholder}
             className="flex-1 px-3 py-2 text-sm text-slate-800 placeholder-slate-400 outline-hidden bg-transparent"
+            disabled={loading}
+          />
+          <VoiceButton
+            language={language}
+            onTranscript={(spokenText) => {
+              setInputText(spokenText);
+              handleSend(spokenText);
+            }}
             disabled={loading}
           />
           <button

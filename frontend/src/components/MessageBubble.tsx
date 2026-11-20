@@ -3,6 +3,7 @@ import { Bot, User, HelpCircle } from 'lucide-react';
 import type { ChatMessage } from '../types';
 import { SchemeCard } from './SchemeCard';
 import { CitationList } from './CitationList';
+import { ListenButton } from './ListenButton';
 
 const CLARIFY_HEADER: Record<string, string> = {
   en: 'Missing Profile Information',
@@ -75,12 +76,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             <CitationList citations={message.citations} language={message.language || 'en'} />
           )}
 
+          {/* Bubble footer with timestamp and Listen button */}
           <div
-            className={`text-[10px] mt-1.5 ${
-              isUser ? 'text-emerald-100 text-right' : 'text-slate-400 text-left'
+            className={`flex items-center justify-between text-[10px] mt-2 pt-1 border-t ${
+              isUser ? 'border-emerald-500/30 text-emerald-100 justify-end' : 'border-slate-100 text-slate-400'
             }`}
           >
-            {message.timestamp}
+            {!isUser && <ListenButton text={message.text} language={message.language || 'en'} />}
+            <span>{message.timestamp}</span>
           </div>
         </div>
       </div>
