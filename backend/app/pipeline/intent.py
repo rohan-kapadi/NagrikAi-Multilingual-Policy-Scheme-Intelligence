@@ -1,56 +1,98 @@
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 from backend.app.llm.client import llm_client
 from backend.app.llm.prompts import INTENT_CLASSIFICATION_PROMPT
+
+# Scheme keyword → id mapping, easy to extend as more schemes are added
+SCHEME_KEYWORDS: Dict[str, str] = {
+    "pm-kisan": "pm-kisan",
+    "pm kisan": "pm-kisan",
+    "kisan samman": "pm-kisan",
+    "किसान सम्मान": "pm-kisan",
+    "पीएम किसान": "pm-kisan",
+    "पीएम-किसान": "pm-kisan",
+    "scholarship": "post-matric-scholarship",
+    "post matric": "post-matric-scholarship",
+    "post-matric": "post-matric-scholarship",
+    "छात्रवृत्ति": "post-matric-scholarship",
+    "शिष्यवृत्ती": "post-matric-scholarship",
+    "nsp": "post-matric-scholarship",
+    "national scholarship": "post-matric-scholarship",
+}
 
 
 def detect_language(text: str) -> str:
     """
     Detects language: Marathi (mr), Hindi (hi), or English (en).
+    Uses Devanagari unicode detection + Marathi vocabulary markers.
     """
-    # Devanagari script detection
     devanagari_chars = len(re.findall(r'[\u0900-\u097F]', text))
     if devanagari_chars > 2:
-        # Check specific Marathi vocabulary / markers
-        marathi_markers = ["आहे", "नाही", "शेतकरी", "कौटुंबिक", "उत्पन्न", "माहिती", "अर्ज", "पात्रता", "करावे", "योजना"]
+        # Marathi-specific vocabulary (not shared with Hindi)
+        marathi_markers = [
+            "आहे", "नाही", "शेतकरी", "कौटुंबिक", "उत्पन्न",
+            "माहिती", "अर्ज", "करावे", "आपले", "आपला", "आपण",
+            "जमीन", "पोर्टल", "शिष्यवृत्ती", "पात्र", "पहा",
+            "सांगा", "आहात", "येईल", "मिळेल"
+        ]
         if any(w in text for w in marathi_markers):
             return "mr"
         return "hi"
     return "en"
 
 
+def detect_target_scheme(text_lower: str) -> Optional[str]:
+    """Detects which scheme the user is referring to."""
+    for keyword, scheme_id in SCHEME_KEYWORDS.items():
+        if keyword in text_lower:
+            return scheme_id
+    return None
+
+
 def classify_intent(message: str) -> Dict[str, Any]:
     """
-    Classifies user message intent into:
-    discover | eligibility | ask_question | explain_notice | compare | chitchat
+    Classifies user message intent using fast keyword heuristics.
+    Falls back to discover if no strong signal found.
+    Returns: {"intent": str, "target_scheme_id": str|None, "language": str}
     """
     text_lower = message.lower()
     lang = detect_language(message)
+    target_scheme_id = detect_target_scheme(text_lower)
 
-    # Fast keyword heuristic check
-    target_scheme_id = None
-    if "pm-kisan" in text_lower or "pm kisan" in text_lower or "kisan samman" in text_lower or "किसान सम्मान" in text_lower:
-        target_scheme_id = "pm-kisan"
-    elif "scholarship" in text_lower or "post matric" in text_lower or "छात्रवृत्ति" in text_lower or "शिष्यवृत्ती" in text_lower:
-        target_scheme_id = "post-matric-scholarship"
+    # Priority order: compare > explain_notice > eligibility > ask_question > chitchat > discover
 
-    # Intent detection
-    if any(w in text_lower for w in ["compare", "vs", "versus", "तुलना"]):
+    if any(w in text_lower for w in ["compare", "vs ", "versus", "तुलना", "फरक काय"]):
         return {"intent": "compare", "target_scheme_id": target_scheme_id, "language": lang}
 
-    if any(w in text_lower for w in ["notice", "circular", "order", "pdf", "अधिसूचना", "परिपत्रक"]):
+    if any(w in text_lower for w in ["notice", "circular", "order", "pdf", "अधिसूचना", "परिपत्रक", "government order"]):
         return {"intent": "explain_notice", "target_scheme_id": target_scheme_id, "language": lang}
 
-    if any(w in text_lower for w in ["eligible", "qualify", "पात्र", "पात्रता", "मिल सकता है", "मिळेल का"]):
+    # Eligibility signals
+    if any(w in text_lower for w in [
+        "eligible", "qualify", "am i", "can i get", "do i qualify",
+        "पात्र", "पात्रता", "मिल सकता", "मिल सकती", "मिलेगा",
+        "मिळेल का", "मिळू शकतो", "पात्र आहे का"
+    ]):
         return {"intent": "eligibility", "target_scheme_id": target_scheme_id, "language": lang}
 
-    if any(w in text_lower for w in ["hello", "namaste", "hi", "hey", "नमस्ते", "नमस्कार", "dhanyawad", "thank"]):
-        # If it's just a greeting without profile info
-        if len(text_lower.split()) <= 3 and not target_scheme_id:
-            return {"intent": "chitchat", "target_scheme_id": None, "language": lang}
-
-    if target_scheme_id and any(w in text_lower for w in ["how to", "apply", "document", "benefit", "किस्त", "पैसे", "अर्ज"]):
+    # Factual question signals
+    if any(w in text_lower for w in [
+        "how to", "how much", "what is", "what are", "document", "apply",
+        "benefit", "amount", "money", "rupee", "kaise", "kitna", "kya hai",
+        "किस्त", "राशि", "दस्तावेज", "कैसे", "क्या है",
+        "किती", "काय आहे", "अर्ज कसा", "कागदपत्रे"
+    ]):
         return {"intent": "ask_question", "target_scheme_id": target_scheme_id, "language": lang}
 
-    # Discover intent when user talks about themselves, what schemes exist, or mentions profile
+    # Chitchat: short greetings with no profile or scheme info
+    greeting_words = ["hello", "hi", "hey", "namaste", "नमस्ते", "नमस्कार", "thank", "dhanyawad", "shukriya", "bye"]
+    if any(w in text_lower for w in greeting_words):
+        # Only chitchat if it's a short message with no meaningful content
+        words = text_lower.split()
+        if len(words) <= 5 and not target_scheme_id and not any(
+            w in text_lower for w in ["kisan", "farmer", "student", "income", "land"]
+        ):
+            return {"intent": "chitchat", "target_scheme_id": None, "language": lang}
+
+    # Default: discover - user is sharing profile info or asking what they can get
     return {"intent": "discover", "target_scheme_id": target_scheme_id, "language": lang}
