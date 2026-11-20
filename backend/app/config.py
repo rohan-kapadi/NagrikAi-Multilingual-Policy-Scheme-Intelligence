@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     DEFAULT_LLM_PROVIDER: str = "groq"
-    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL: str = "qwen/qwen3.8-27b"
     GEMINI_MODEL: str = "gemini-1.5-flash"
     
     # Embedding Settings

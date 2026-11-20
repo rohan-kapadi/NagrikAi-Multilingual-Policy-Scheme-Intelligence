@@ -77,11 +77,11 @@ def classify_intent(message: str) -> Dict[str, Any]:
 
     # Factual question signals
     if any(w in text_lower for w in [
-        "how to", "how much", "what is", "what are", "document", "apply",
-        "benefit", "amount", "money", "rupee", "kaise", "kitna", "kya hai",
-        "किस्त", "राशि", "दस्तावेज", "कैसे", "क्या है",
-        "किती", "काय आहे", "अर्ज कसा", "कागदपत्रे"
-    ]):
+        "does", "is there", "will", "provide", "give", "how to", "how much", "what is", "what are",
+        "document", "apply", "benefit", "amount", "money", "rupee", "kaise", "kitna", "kya hai",
+        "किस्त", "राशि", "दस्तावेज", "कैसे", "क्या", "देता है", "मिलता है",
+        "किती", "काय आहे", "अर्ज कसा", "कागदपत्रे", "मिळेल काय"
+    ]) or "?" in text_lower:
         return {"intent": "ask_question", "target_scheme_id": target_scheme_id, "language": lang}
 
     # Chitchat: short greetings with no profile or scheme info
