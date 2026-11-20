@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.config import settings
 from backend.app.api.schemes import router as schemes_router
+from backend.app.api.eligibility import router as eligibility_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -18,6 +19,7 @@ app.add_middleware(
 )
 
 app.include_router(schemes_router)
+app.include_router(eligibility_router)
 
 
 @app.get("/api/health")
