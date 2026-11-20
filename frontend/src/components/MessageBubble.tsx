@@ -4,6 +4,12 @@ import type { ChatMessage } from '../types';
 import { SchemeCard } from './SchemeCard';
 import { CitationList } from './CitationList';
 
+const CLARIFY_HEADER: Record<string, string> = {
+  en: 'Missing Profile Information',
+  hi: 'अतिरिक्त जानकारी आवश्यक है',
+  mr: 'अधिक माहिती आवश्यक आहे',
+};
+
 interface MessageBubbleProps {
   message: ChatMessage;
 }
@@ -39,7 +45,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             <div className="mt-3 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 flex items-start space-x-2">
               <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold mb-0.5">Missing Profile Information</p>
+                <p className="font-semibold mb-0.5">
+                  {CLARIFY_HEADER[message.language || 'en'] || CLARIFY_HEADER['en']}
+                </p>
                 <p>{message.clarifying_question}</p>
               </div>
             </div>

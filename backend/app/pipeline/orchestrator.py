@@ -139,7 +139,8 @@ def process_chat_turn(request: ChatRequest) -> ChatResponse:
         ChatSchemeItem(
             id=s.id,
             name=s.name.get(lang, s.name.get("en", s.id)),
-            why_relevant=s.summary.get(lang, s.summary.get("en", ""))
+            why_relevant=s.summary.get(lang, s.summary.get("en", "")),
+            official_url=s.official_url,
         )
         for s in matched_schemes
     ]

@@ -68,6 +68,7 @@ export interface ChatSchemeItem {
   id: string;
   name: string;
   why_relevant: string;
+  official_url?: string;
 }
 
 export interface ChatResponse {

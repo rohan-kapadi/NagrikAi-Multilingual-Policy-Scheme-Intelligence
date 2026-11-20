@@ -32,12 +32,7 @@ export const SchemeCard: React.FC<SchemeCardProps> = ({ scheme, eligibility, lan
     unverified: 'Unverified Data (TODO_VERIFY)',
   };
 
-  const officialUrl =
-    scheme.id === 'pm-kisan'
-      ? 'https://pmkisan.gov.in'
-      : scheme.id === 'post-matric-scholarship'
-      ? 'https://scholarships.gov.in'
-      : 'https://india.gov.in';
+  const officialUrl = scheme.official_url || 'https://india.gov.in';
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs hover:border-emerald-300 transition-all mb-3 text-left">

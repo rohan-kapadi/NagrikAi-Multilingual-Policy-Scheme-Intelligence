@@ -76,6 +76,7 @@ class ChatSchemeItem(BaseModel):
     id: str
     name: str
     why_relevant: str
+    official_url: str = ""  # Pass through so frontend doesn't need a hardcoded lookup
 
 
 class Citation(BaseModel):

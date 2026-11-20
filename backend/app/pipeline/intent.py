@@ -67,9 +67,10 @@ def classify_intent(message: str) -> Dict[str, Any]:
     if any(w in text_lower for w in ["notice", "circular", "order", "pdf", "अधिसूचना", "परिपत्रक", "government order"]):
         return {"intent": "explain_notice", "target_scheme_id": target_scheme_id, "language": lang}
 
-    # Eligibility signals
+    # Eligibility signals — must check BEFORE ask_question so "am i eligible?" routes correctly
     if any(w in text_lower for w in [
-        "eligible", "qualify", "am i", "can i get", "do i qualify",
+        "eligible", "qualify", "am i eligible", "can i get", "do i qualify",
+        "am i a", "am i entitled", "will i get",
         "पात्र", "पात्रता", "मिल सकता", "मिल सकती", "मिलेगा",
         "मिळेल का", "मिळू शकतो", "पात्र आहे का"
     ]):

@@ -38,19 +38,25 @@ def build_deterministic_explanation(
     if intent == "chitchat":
         return CHITCHAT_RESPONSES.get(lang, CHITCHAT_RESPONSES["en"])
 
-    # Out-of-domain or ungrounded question check
+    # Out-of-domain / ungrounded question check
+    # If a question was asked (has "?") but no chunks were retrieved — the answer is not in the source
     lower_msg = user_message.lower()
-    tractor_words = ["tractor", "ट्रैक्टर", "ट्रॅक्टर", "loan waiver", "कर्ज माफी", "free seed", "मुफ्त बीज"]
-    if any(tw in lower_msg for tw in tractor_words) and not any(tw in c.get("text", "").lower() for c in chunks for tw in tractor_words):
+    is_specific_question = intent == "ask_question" and "?" in lower_msg
+    no_chunks = not chunks
+    # Also catch known out-of-domain topics not found in chunk content
+    ood_phrases = ["tractor", "ट्रैक्टर", "ट्रॅक्टर", "loan waiver", "कर्ज माफी", "free seed", "मुफ्त बीज",
+                   "diesel subsidy", "पीएम आवास", "pm awas", "insurance", "fasal bima", "फसल बीमा"]
+    has_ood_phrase = any(tw in lower_msg for tw in ood_phrases)
+    phrase_in_chunks = any(tw in c.get("text", "").lower() for c in chunks for tw in ood_phrases)
+
+    if (is_specific_question and no_chunks) or (has_ood_phrase and not phrase_in_chunks):
+        portal_url = schemes[0].official_url if schemes else "https://india.gov.in"
         if lang == "hi":
-            portal_url = schemes[0].official_url if schemes else "https://pmkisan.gov.in"
-            return f"यह जानकारी उपलब्ध स्रोत में निर्दिष्ट नहीं है (not specified in the source)। इस योजना के अंतर्गत इसका कोई विवरण उपलब्ध आधिकारिक दिशानिर्देशों में नहीं दिया गया है। अधिक जानकारी के लिए आधिकारिक पोर्टल देखें: {portal_url}"
+            return f"यह जानकारी उपलब्ध स्रोत में निर्दिष्ट नहीं है (not specified in the source)। इस विषय का कोई विवरण उपलब्ध आधिकारिक दिशानिर्देशों में नहीं मिला। अधिक जानकारी के लिए आधिकारिक पोर्टल देखें: {portal_url}"
         elif lang == "mr":
-            portal_url = schemes[0].official_url if schemes else "https://pmkisan.gov.in"
-            return f"ही माहिती उपलब्ध स्रोतामध्ये नमूद केलेली नाही (not specified in the source). उपलब्ध अधिकृत मार्गदर्शक तत्त्वांमध्ये याचा तपशील नाही. कृपया अधिक माहितीसाठी अधिकृत पोर्टल तपासा: {portal_url}"
+            return f"ही माहिती उपलब्ध स्रोतामध्ये नमूद केलेली नाही (not specified in the source). उपलब्ध अधिकृत मार्गदर्शक तत्त्वांमध्ये याचा तपशील आढळला नाही. कृपया अधिक माहितीसाठी अधिकृत पोर्टल तपासा: {portal_url}"
         else:
-            portal_url = schemes[0].official_url if schemes else "https://pmkisan.gov.in"
-            return f"This information is not specified in the source. There is no mention of this in the official scheme guidelines. Please refer to the official portal for authorized details: {portal_url}"
+            return f"This information is not specified in the source. No details about this were found in the available official guidelines. Please refer to the official portal for authoritative information: {portal_url}"
 
     # Discover intent: list schemes and explain why relevant
     if intent == "discover":
@@ -173,6 +179,26 @@ def explain(
         answer = build_deterministic_explanation(
             user_message, lang, intent, schemes, eligibility_results, chunks, clarifying_question
         )
+        return answer, disclaimer
+
+    # Run out-of-domain / ungrounded check BEFORE calling LLM
+    # so we never let the LLM hallucinate facts not in our source corpus
+    lower_msg = user_message.lower()
+    is_specific_question = intent == "ask_question" and "?" in lower_msg
+    no_chunks = not chunks
+    ood_phrases = ["tractor", "ट्रैक्टर", "ट्रॅक्टर", "loan waiver", "कर्ज माफी", "free seed", "मुफ्त बीज",
+                   "diesel subsidy", "पीएम आवास", "pm awas", "insurance", "fasal bima", "फसल बीमा"]
+    has_ood_phrase = any(tw in lower_msg for tw in ood_phrases)
+    phrase_in_chunks = any(tw in c.get("text", "").lower() for c in chunks for tw in ood_phrases)
+
+    if (is_specific_question and no_chunks) or (has_ood_phrase and not phrase_in_chunks):
+        portal_url = schemes[0].official_url if schemes else "https://india.gov.in"
+        if lang == "hi":
+            answer = f"यह जानकारी उपलब्ध स्रोत में निर्दिष्ट नहीं है (not specified in the source)। इस विषय का कोई विवरण उपलब्ध आधिकारिक दिशानिर्देशों में नहीं मिला। अधिक जानकारी के लिए आधिकारिक पोर्टल देखें: {portal_url}"
+        elif lang == "mr":
+            answer = f"ही माहिती उपलब्ध स्रोतामध्ये नमूद केलेली नाही (not specified in the source). उपलब्ध अधिकृत मार्गदर्शक तत्त्वांमध्ये याचा तपशील आढळला नाही. कृपया अधिक माहितीसाठी अधिकृत पोर्टल तपासा: {portal_url}"
+        else:
+            answer = f"This information is not specified in the source. No details about this were found in the available official guidelines. Please refer to the official portal for authoritative information: {portal_url}"
         return answer, disclaimer
 
     # If external LLM is available, invoke it with strict grounding prompt
