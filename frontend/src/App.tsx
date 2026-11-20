@@ -1,157 +1,146 @@
 import { useState, useEffect } from 'react';
 import { checkHealth } from './lib/api';
 import type { HealthStatus } from './lib/api';
-import { ShieldCheck, AlertCircle, CheckCircle2, MessageSquare, Globe2, Sparkles } from 'lucide-react';
+import type { CitizenProfile, SupportedLanguage } from './types';
+import { ChatWindow } from './components/ChatWindow';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { ProfilePanel } from './components/ProfilePanel';
+import { UserCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
-  const [lang, setLang] = useState<'en' | 'hi' | 'mr'>('en');
+  const [lang, setLang] = useState<SupportedLanguage>('en');
+  const [profile, setProfile] = useState<Partial<CitizenProfile>>({});
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
 
   const t = {
     en: {
       title: 'NagrikAI',
-      subtitle: 'Your guide to government schemes & welfare programs',
-      connected: 'Backend connected',
-      disconnected: 'Backend unreachable',
-      phaseDone: 'Phases 0–3 complete — ready for chat pipeline',
-      readyMsg: 'FastAPI + ChromaDB backend, multilingual profile extractor, and eligibility engine are live.',
-      apiDocs: 'Swagger API Docs',
-      nextPhase: 'Next: Phase 4 — Chat pipeline & orchestrator',
-      disclaimer: 'NagrikAI is an informational tool. Eligibility decisions are made solely by official government portals and competent authorities.'
+      subtitle: 'Multilingual Policy & Scheme Intelligence',
+      profileBtn: 'Profile',
+      connected: 'Live',
+      disconnected: 'Offline',
+      disclaimer: 'Disclaimer: NagrikAI is an informational tool. Decisions on eligibility and benefits are made solely by official government portals and competent authorities. Placeholders marked TODO_VERIFY represent unverified demo data.',
     },
     hi: {
       title: 'नागरिक AI',
-      subtitle: 'सरकारी योजनाओं और कल्याण कार्यक्रमों का आपका मार्गदर्शक',
-      connected: 'बैकएंड कनेक्टेड',
-      disconnected: 'बैकएंड उपलब्ध नहीं',
-      phaseDone: 'चरण 0–3 पूर्ण — चैट पाइपलाइन के लिए तैयार',
-      readyMsg: 'फास्टएपीआई + ChromaDB बैकएंड, बहुभाषी प्रोफ़ाइल एक्सट्रैक्टर और पात्रता इंजन लाइव हैं।',
-      apiDocs: 'Swagger API डॉक्स',
-      nextPhase: 'अगला: चरण 4 — चैट पाइपलाइन',
-      disclaimer: 'अस्वीकरण: नागरिक AI केवल जानकारी के लिए है। पात्रता का अंतिम निर्णय केवल आधिकारिक सरकारी पोर्टल और सक्षम प्राधिकरणों द्वारा लिया जाता है।'
+      subtitle: 'सरकारी योजना एवं नीति मार्गदर्शक',
+      profileBtn: 'प्रोफ़ाइल',
+      connected: 'लाइव',
+      disconnected: 'ऑफ़लाइन',
+      disclaimer: 'अस्वीकरण: नागरिक AI केवल सूचनात्मक मार्गदर्शन प्रदान करता है। पात्रता और लाभों पर अंतिम निर्णय केवल आधिकारिक सरकारी पोर्टल और संबंधित प्राधिकरणों द्वारा लिया जाता है। TODO_VERIFY चिह्नित डेटा केवल डेमो के लिए है।',
     },
     mr: {
       title: 'नागरिक AI',
-      subtitle: 'सरकारी योजना आणि कल्याण कार्यक्रमांचा आपला मार्गदर्शक',
-      connected: 'बॅकएंड कनेक्टेड',
-      disconnected: 'बॅकएंड उपलब्ध नाही',
-      phaseDone: 'टप्पे 0–3 पूर्ण — चॅट पाइपलाइनसाठी तयार',
-      readyMsg: 'FastAPI + ChromaDB बॅकएंड, बहुभाषिक प्रोफाइल एक्स्ट्रॅक्टर आणि पात्रता इंजन लाइव आहेत.',
-      apiDocs: 'Swagger API डॉक्स',
-      nextPhase: 'पुढे: टप्पा 4 — चॅट पाइपलाइन',
-      disclaimer: 'अस्वीकरण: नागरिक AI केवळ माहितीच्या उद्देशाने आहे. पात्रतेचा अंतिम निर्णय अधिकृत सरकारी पोर्टल आणि संबंधित प्राधिकरणांचा असेल.'
-    }
-  };
-
-  const c = t[lang];
+      subtitle: 'सरकारी योजना आणि धोरण मार्गदर्शक',
+      profileBtn: 'प्रोफाइल',
+      connected: 'लाइव्ह',
+      disconnected: 'ऑफलाइन',
+      disclaimer: 'अस्वीकरण: नागरिक AI केवळ माहितीच्या उद्देशाने आहे. पात्रतेबाबतचा अंतिम निर्णय अधिकृत सरकारी पोर्टलचा असेल. TODO_VERIFY चिन्हांकित डेटा हा केवळ प्रात्यक्षिकासाठी आहे.',
+    },
+  }[lang];
 
   useEffect(() => {
     checkHealth()
-      .then((data) => { setHealth(data); setLoading(false); })
-      .catch(() => { setHasError(true); setLoading(false); });
+      .then((data) => {
+        setHealth(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setHasError(true);
+        setLoading(false);
+      });
   }, []);
 
-  const isHealthy = !hasError && health?.status === 'healthy';
+  const collectedFieldsCount = Object.values(profile).filter(
+    (v) => v !== null && v !== undefined && v !== ''
+  ).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur sticky top-0 z-10 shadow-sm">
+      <header className="border-b border-slate-200 bg-white sticky top-0 z-30 shadow-xs">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          {/* Logo & Brand */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+            <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
               न
             </div>
             <div>
-              <h1 className="font-bold text-lg leading-tight text-slate-800">{c.title}</h1>
-              <p className="text-xs text-slate-500 hidden sm:block">{c.subtitle}</p>
+              <h1 className="font-bold text-base leading-tight text-slate-900 flex items-center space-x-2">
+                <span>{t.title}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+                  Track 1
+                </span>
+              </h1>
+              <p className="text-xs text-slate-500 hidden sm:block">{t.subtitle}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* Language Switcher */}
-            <div className="flex items-center gap-0.5 bg-slate-100 p-1 rounded-lg border border-slate-200 text-xs font-medium">
-              <Globe2 className="w-3.5 h-3.5 text-slate-400 mx-1" />
-              {(['en', 'hi', 'mr'] as const).map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`px-2.5 py-1 rounded transition-all ${
-                    lang === l
-                      ? 'bg-white text-emerald-700 shadow font-semibold'
-                      : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  {l === 'en' ? 'English' : l === 'hi' ? 'हिन्दी' : 'मराठी'}
-                </button>
-              ))}
-            </div>
+          {/* Controls: Language + Profile Drawer + Health */}
+          <div className="flex items-center space-x-3">
+            <LanguageSwitcher currentLanguage={lang} onLanguageChange={setLang} />
 
-            {/* Health status badge */}
-            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${
-              loading ? 'border-slate-200 text-slate-400'
-              : isHealthy ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-              : 'border-rose-200 bg-rose-50 text-rose-700'
-            }`}>
+            {/* Profile Drawer Toggle Button */}
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-xs transition-colors"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="hidden sm:inline">{t.profileBtn}</span>
+              {collectedFieldsCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center font-bold">
+                  {collectedFieldsCount}
+                </span>
+              )}
+            </button>
+
+            {/* Health pill */}
+            <div className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-medium border bg-white">
               {loading ? (
-                <span className="animate-pulse">Checking...</span>
-              ) : isHealthy ? (
-                <><CheckCircle2 className="w-3.5 h-3.5" />{c.connected}</>
+                <span className="text-slate-400 animate-pulse">Checking...</span>
+              ) : health?.status === 'healthy' && !hasError ? (
+                <span className="flex items-center text-emerald-700 font-medium">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600 mr-1" />
+                  {t.connected}
+                </span>
               ) : (
-                <><AlertCircle className="w-3.5 h-3.5" />{c.disconnected}</>
+                <span className="flex items-center text-rose-700 font-medium">
+                  <AlertCircle className="w-3 h-3 text-rose-600 mr-1" />
+                  {t.disconnected}
+                </span>
               )}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-10 flex flex-col justify-center items-center gap-6">
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 w-full max-w-lg text-center">
-          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <ShieldCheck className="w-9 h-9 text-emerald-600" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-800 mb-1">{c.phaseDone}</h2>
-          <p className="text-sm text-slate-500 mb-6">{c.readyMsg}</p>
+      {/* Main Chat Interface */}
+      <main className="flex-1 flex flex-col relative overflow-hidden">
+        <ChatWindow
+          language={lang}
+          profile={profile}
+          onProfileUpdate={(updated) => setProfile((prev) => ({ ...prev, ...updated }))}
+        />
 
-          {/* Status table */}
-          <div className="text-left text-xs rounded-xl border border-slate-200 overflow-hidden mb-5">
-            {[
-              ['Health', health?.status || 'Checking...'],
-              ['Version', health?.version || '0.1.0'],
-              ['Schemes loaded', '2 (PM-KISAN, Post-Matric Scholarship)'],
-              ['ChromaDB index', '10 multilingual chunks'],
-              ['Tests passing', '13 / 13'],
-            ].map(([k, v]) => (
-              <div key={k} className="flex justify-between items-center px-4 py-2.5 border-b border-slate-100 last:border-b-0 hover:bg-slate-50 transition-colors">
-                <span className="text-slate-500 font-medium">{k}</span>
-                <span className="text-slate-800 font-semibold">{v}</span>
-              </div>
-            ))}
-          </div>
-
-          <a
-            href="http://localhost:8000/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-800 font-medium underline underline-offset-2 mb-6"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            {c.apiDocs} →
-          </a>
-
-          <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>{c.nextPhase}</span>
-          </div>
-        </div>
+        {/* Profile Side Drawer */}
+        <ProfilePanel
+          profile={profile}
+          onUpdateProfile={(updated) => setProfile(updated)}
+          language={lang}
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+        />
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-400">
-        <p>⚠️ {c.disclaimer}</p>
+      {/* Persistent Disclaimer Footer */}
+      <footer className="border-t border-slate-200 bg-white py-2.5 px-4 text-center text-[11px] text-slate-500">
+        <div className="max-w-4xl mx-auto">
+          <p>{t.disclaimer}</p>
+        </div>
       </footer>
     </div>
   );

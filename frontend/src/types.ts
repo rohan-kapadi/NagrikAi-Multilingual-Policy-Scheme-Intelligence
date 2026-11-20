@@ -54,7 +54,31 @@ export interface EligibilityResult {
   criteria_results: CriterionResult[];
   missing_fields: string[];
   required_documents: string[];
-  citations: any[];
+  citations: Citation[];
+}
+
+export interface Citation {
+  title: string;
+  page?: number;
+  section?: string;
+  url: string;
+}
+
+export interface ChatSchemeItem {
+  id: string;
+  name: string;
+  why_relevant: string;
+}
+
+export interface ChatResponse {
+  answer: string;
+  language: string;
+  profile: Partial<CitizenProfile>;
+  clarifying_question?: string | null;
+  schemes: ChatSchemeItem[];
+  eligibility: EligibilityResult[];
+  citations: Citation[];
+  disclaimer: string;
 }
 
 export interface ChatMessage {
@@ -63,8 +87,10 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
   language?: string;
-  schemes?: Array<{ id: string; name: string; why_relevant: string }>;
+  schemes?: ChatSchemeItem[];
   eligibility?: EligibilityResult[];
-  citations?: Array<{ title: string; page?: number; section?: string; url: string }>;
+  citations?: Citation[];
   clarifying_question?: string | null;
 }
+
+export type SupportedLanguage = 'en' | 'hi' | 'mr';
