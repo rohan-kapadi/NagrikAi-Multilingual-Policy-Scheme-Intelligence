@@ -45,11 +45,12 @@ def build_deterministic_explanation(
     no_chunks = not chunks
     # Also catch known out-of-domain topics not found in chunk content
     ood_phrases = ["tractor", "ट्रैक्टर", "ट्रॅक्टर", "loan waiver", "कर्ज माफी", "free seed", "मुफ्त बीज",
-                   "diesel subsidy", "पीएम आवास", "pm awas", "insurance", "fasal bima", "फसल बीमा"]
+                   "diesel subsidy"]
     has_ood_phrase = any(tw in lower_msg for tw in ood_phrases)
     phrase_in_chunks = any(tw in c.get("text", "").lower() for c in chunks for tw in ood_phrases)
+    has_live_chunks = any(c.get("metadata", {}).get("live_source") for c in chunks)
 
-    if (is_specific_question and no_chunks) or (has_ood_phrase and not phrase_in_chunks):
+    if (is_specific_question and no_chunks) or (has_ood_phrase and not phrase_in_chunks and not has_live_chunks):
         portal_url = schemes[0].official_url if schemes else "https://india.gov.in"
         if lang == "hi":
             return f"यह जानकारी उपलब्ध स्रोत में निर्दिष्ट नहीं है (not specified in the source)। इस विषय का कोई विवरण उपलब्ध आधिकारिक दिशानिर्देशों में नहीं मिला। अधिक जानकारी के लिए आधिकारिक पोर्टल देखें: {portal_url}"
@@ -102,13 +103,20 @@ def build_deterministic_explanation(
             scheme_title = scheme.name.get(lang, scheme.name.get("en", res.scheme_id)) if scheme else res.scheme_id
 
             if lang == "hi":
-                status_text = "पात्र हैं (Eligible)" if res.overall == "eligible" else "पात्र नहीं हैं (Not Eligible)" if res.overall == "not_eligible" else "और जानकारी आवश्यक है (Needs More Info)"
-                lines.append(f"### {scheme_title}")
-                lines.append(f"**पात्रता स्थिति:** {status_text}\n")
-                lines.append("**पात्रता मानदंड समीक्षा:**")
-                for cr in res.criteria_results:
-                    icon = "✅" if cr.status == "met" else "❌" if cr.status == "not_met" else "❓"
-                    lines.append(f"- {icon} {cr.label} (आवश्यकता: {cr.required})")
+                if not res.criteria_results:
+                    summary_text = scheme.summary.get("hi", scheme.summary.get("en", "")) if scheme else ""
+                    lines.append(f"### {scheme_title}")
+                    lines.append(f"**आधिकारिक दिशानिर्देश एवं विवरण:** {summary_text}\n")
+                    if chunks:
+                        lines.append(f"• {chunks[0]['text'][:300]}...\n")
+                else:
+                    status_text = "पात्र हैं (Eligible)" if res.overall == "eligible" else "पात्र नहीं हैं (Not Eligible)" if res.overall == "not_eligible" else "और जानकारी आवश्यक है (Needs More Info)"
+                    lines.append(f"### {scheme_title}")
+                    lines.append(f"**पात्रता स्थिति:** {status_text}\n")
+                    lines.append("**पात्रता मानदंड समीक्षा:**")
+                    for cr in res.criteria_results:
+                        icon = "✅" if cr.status == "met" else "❌" if cr.status == "not_met" else "❓"
+                        lines.append(f"- {icon} {cr.label} (आवश्यकता: {cr.required})")
                 if res.required_documents:
                     lines.append("\n**आवश्यक दस्तावेज:**")
                     for doc in res.required_documents:
@@ -117,13 +125,20 @@ def build_deterministic_explanation(
                     lines.append(f"\n**आवेदन कैसे करें:** {scheme.how_to_apply.get('hi', scheme.how_to_apply.get('en', ''))}")
                     lines.append(f"**आधिकारिक लिंक:** [{scheme.official_url}]({scheme.official_url})\n")
             elif lang == "mr":
-                status_text = "पात्र आहात (Eligible)" if res.overall == "eligible" else "पात्र नाही (Not Eligible)" if res.overall == "not_eligible" else "अधिक माहिती आवश्यक आहे (Needs More Info)"
-                lines.append(f"### {scheme_title}")
-                lines.append(f"**पात्रता स्थिती:** {status_text}\n")
-                lines.append("**पात्रता निकष पडताळणी:**")
-                for cr in res.criteria_results:
-                    icon = "✅" if cr.status == "met" else "❌" if cr.status == "not_met" else "❓"
-                    lines.append(f"- {icon} {cr.label} (आवश्यक: {cr.required})")
+                if not res.criteria_results:
+                    summary_text = scheme.summary.get("mr", scheme.summary.get("en", "")) if scheme else ""
+                    lines.append(f"### {scheme_title}")
+                    lines.append(f"**अधिकृत तपशील व मार्गदर्शक तत्त्वे:** {summary_text}\n")
+                    if chunks:
+                        lines.append(f"• {chunks[0]['text'][:300]}...\n")
+                else:
+                    status_text = "पात्र आहात (Eligible)" if res.overall == "eligible" else "पात्र नाही (Not Eligible)" if res.overall == "not_eligible" else "अधिक माहिती आवश्यक आहे (Needs More Info)"
+                    lines.append(f"### {scheme_title}")
+                    lines.append(f"**पात्रता स्थिती:** {status_text}\n")
+                    lines.append("**पात्रता निकष पडताळणी:**")
+                    for cr in res.criteria_results:
+                        icon = "✅" if cr.status == "met" else "❌" if cr.status == "not_met" else "❓"
+                        lines.append(f"- {icon} {cr.label} (आवश्यक: {cr.required})")
                 if res.required_documents:
                     lines.append("\n**आवश्यक कागदपत्रे:**")
                     for doc in res.required_documents:
@@ -132,13 +147,20 @@ def build_deterministic_explanation(
                     lines.append(f"\n**अर्ज कसा करावा:** {scheme.how_to_apply.get('mr', scheme.how_to_apply.get('en', ''))}")
                     lines.append(f"**अधिकृत लिंक:** [{scheme.official_url}]({scheme.official_url})\n")
             else:
-                status_text = "Eligible" if res.overall == "eligible" else "Not Eligible" if res.overall == "not_eligible" else "Needs More Information"
-                lines.append(f"### {scheme_title}")
-                lines.append(f"**Eligibility Status:** {status_text}\n")
-                lines.append("**Criteria Assessment:**")
-                for cr in res.criteria_results:
-                    icon = "✅" if cr.status == "met" else "❌" if cr.status == "not_met" else "❓"
-                    lines.append(f"- {icon} {cr.label} (Required: {cr.required})")
+                if not res.criteria_results:
+                    summary_text = scheme.summary.get("en", "") if scheme else ""
+                    lines.append(f"### {scheme_title}")
+                    lines.append(f"**Official Guidelines & Overview:** {summary_text}\n")
+                    if chunks:
+                        lines.append(f"• {chunks[0]['text'][:300]}...\n")
+                else:
+                    status_text = "Eligible" if res.overall == "eligible" else "Not Eligible" if res.overall == "not_eligible" else "Needs More Information"
+                    lines.append(f"### {scheme_title}")
+                    lines.append(f"**Eligibility Status:** {status_text}\n")
+                    lines.append("**Criteria Assessment:**")
+                    for cr in res.criteria_results:
+                        icon = "✅" if cr.status == "met" else "❌" if cr.status == "not_met" else "❓"
+                        lines.append(f"- {icon} {cr.label} (Required: {cr.required})")
                 if res.required_documents:
                     lines.append("\n**Required Documents:**")
                     for doc in res.required_documents:
@@ -187,11 +209,12 @@ def explain(
     is_specific_question = intent == "ask_question" and "?" in lower_msg
     no_chunks = not chunks
     ood_phrases = ["tractor", "ट्रैक्टर", "ट्रॅक्टर", "loan waiver", "कर्ज माफी", "free seed", "मुफ्त बीज",
-                   "diesel subsidy", "पीएम आवास", "pm awas", "insurance", "fasal bima", "फसल बीमा"]
+                   "diesel subsidy"]
     has_ood_phrase = any(tw in lower_msg for tw in ood_phrases)
     phrase_in_chunks = any(tw in c.get("text", "").lower() for c in chunks for tw in ood_phrases)
+    has_live_chunks = any(c.get("metadata", {}).get("live_source") for c in chunks)
 
-    if (is_specific_question and no_chunks) or (has_ood_phrase and not phrase_in_chunks):
+    if (is_specific_question and no_chunks) or (has_ood_phrase and not phrase_in_chunks and not has_live_chunks):
         portal_url = schemes[0].official_url if schemes else "https://india.gov.in"
         if lang == "hi":
             answer = f"यह जानकारी उपलब्ध स्रोत में निर्दिष्ट नहीं है (not specified in the source)। इस विषय का कोई विवरण उपलब्ध आधिकारिक दिशानिर्देशों में नहीं मिला। अधिक जानकारी के लिए आधिकारिक पोर्टल देखें: {portal_url}"
