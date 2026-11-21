@@ -46,8 +46,14 @@ NagrikAI solves this through one conversational interface (text and voice) in **
 5. NagrikVault — Zero-Knowledge client-side encrypted (AES-256-GCM) document locker with SHA-256 cryptographic verification hashes and automated profile extraction (Land 7/12, Income Certificate).
 6. Nagrik Copilot Browser Extension (Manifest V3) — 1-click portal autofill assistant bridging verified citizen profile fields into official government application forms with human review.
 
+### P2 — Post-hackathon polish features (Phases 9–11)
+7. **Landing Page** — public marketing page at `/` with hero, features grid, how-it-works, language showcase, CTA to signup.
+8. **Auth System** — email+password signup/login with SQLite persistence, bcrypt hashing, JWT session tokens. Protected app routes require login.
+9. **Negotiated Memory** — user-controlled persistent memory across sessions. The AI proposes what to remember after each turn; user approves/rejects/edits each proposal individually. Memory is used as context in subsequent answers. Full CRUD memory panel in the UI.
+10. **Explainability Layer** — every AI answer has a collapsible "Why this answer?" panel showing: intent classified, memory fields used, chunks retrieved with relevance scores, eligibility operators that fired.
+
 ### Out of scope (do NOT build)
-Autonomous unassisted form submission without human confirmation (assisted autofill with citizen confirmation is supported), admin panel, multi-user auth server, large-scale scraping, mobile app, multi-agent swarms, payments, notifications.
+Autonomous unassisted form submission without human confirmation (assisted autofill with citizen confirmation is supported), large-scale scraping, mobile app, multi-agent swarms in chat path, payments, push notifications.
 
 ## 4. Core design principles
 
@@ -243,14 +249,23 @@ Target 6–8 schemes, hand-verified from official sources. Suggested set:
 
 | Method | Path | Purpose |
 |---|---|---|
-| POST | `/api/chat` | Main turn. Body: `{session_id, message, language}`. Returns answer text, optional `schemes[]`, `eligibility[]`, `citations[]`, `clarifying_question`, `profile` |
+| POST | `/api/chat` | Main turn. Body: `{session_id, message, language, user_id?}`. Returns answer, schemes, eligibility, citations, `memory_proposals`, `explanation` |
 | GET | `/api/schemes` | List schemes (filter by `category`, `state`) |
 | GET | `/api/schemes/{id}` | Scheme detail |
 | POST | `/api/eligibility` | Body: `{scheme_id, profile}` → eligibility result (no LLM) |
 | POST | `/api/notice/explain` | P1. Multipart file + `language` → summary, key points, deadlines, citations to pages |
 | GET | `/api/health` | Health check |
+| POST | `/api/auth/signup` | P2. Body: `{email, name, password}` → `{token, user}` |
+| POST | `/api/auth/login` | P2. Body: `{email, password}` → `{token, user}` |
+| GET | `/api/auth/me` | P2. Returns current user (requires token) |
+| POST | `/api/auth/logout` | P2. Clears session |
+| GET | `/api/memory` | P2. Returns all memory entries for the authenticated user |
+| POST | `/api/memory` | P2. Add a memory entry |
+| PATCH | `/api/memory/{id}` | P2. Edit a memory entry |
+| DELETE | `/api/memory/{id}` | P2. Delete a specific memory entry |
+| DELETE | `/api/memory` | P2. Clear all memory for user |
 
-Chat response shape:
+Chat response shape (Phase 10+):
 ```json
 {
   "answer": "string in requested language",
@@ -260,7 +275,48 @@ Chat response shape:
   "schemes": [ { "id": "", "name": "", "why_relevant": "" } ],
   "eligibility": [ ],
   "citations": [ { "title": "", "page": 0, "section": "", "url": "" } ],
-  "disclaimer": "string in requested language"
+  "disclaimer": "string in requested language",
+  "memory_proposals": [
+    {
+      "key": "occupation",
+      "proposed_value": "farmer",
+      "current_value": null,
+      "change_type": "new",
+      "reason": "You mentioned being a farmer"
+    }
+  ],
+  "explanation": {
+    "intent": "eligibility",
+    "memory_fields_used": ["occupation", "land_holding_hectares"],
+    "chunks_retrieved": [{"title": "...", "page": 1, "score": 0.87}],
+    "eligibility_operators_fired": [{"criterion": "Owns cultivable land", "op": "gt", "value": 0, "user_value": 1.2, "result": "met"}],
+    "language_detected": "hi"
+  }
+}
+```
+
+### Memory Entry model
+```json
+{
+  "id": "uuid",
+  "user_id": "uuid",
+  "key": "occupation",
+  "value": "farmer",
+  "source": "chat | manual | vault",
+  "approved": true,
+  "created_at": "ISO8601",
+  "updated_at": "ISO8601"
+}
+```
+
+### MemoryProposal model
+```json
+{
+  "key": "land_holding_hectares",
+  "proposed_value": 1.2,
+  "current_value": null,
+  "change_type": "new",
+  "reason": "You mentioned 1.2 hectare land"
 }
 ```
 

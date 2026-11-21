@@ -2,23 +2,82 @@ import { useState, useEffect } from 'react';
 import { checkHealth } from './lib/api';
 import type { HealthStatus } from './lib/api';
 import type { CitizenProfile, SupportedLanguage } from './types';
+import { loadAuth, clearAuth, saveAuth } from './lib/auth';
+import type { User } from './lib/auth';
 import { ChatWindow } from './components/ChatWindow';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ProfilePanel } from './components/ProfilePanel';
 import { NoticeUpload } from './components/NoticeUpload';
 import { NagrikVault } from './components/NagrikVault';
-import { UserCheck, CheckCircle2, AlertCircle, MessageSquare, FileText, ShieldCheck } from 'lucide-react';
+import { AuthModal } from './components/AuthModal';
+import { MemoryPanel } from './components/MemoryPanel';
+import { LandingPage } from './pages/LandingPage';
+import {
+  UserCheck, CheckCircle2, AlertCircle, MessageSquare,
+  FileText, ShieldCheck, Brain, LogOut, LogIn
+} from 'lucide-react';
 
 type ActiveTab = 'chat' | 'notice' | 'vault';
+type AppView = 'landing' | 'app';
 
 export default function App() {
+  // ── Routing ───────────────────────────────────────────
+  const [view, setView] = useState<AppView>('landing');
+
+  // ── Auth ─────────────────────────────────────────────
+  const [user, setUser] = useState<User | null>(null);
+  const [authModal, setAuthModal] = useState<{ open: boolean; tab: 'login' | 'signup' }>({
+    open: false,
+    tab: 'login',
+  });
+
+  // ── App state ─────────────────────────────────────────
   const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [hasError, setHasError] = useState<boolean>(false);
+  const [healthLoading, setHealthLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [lang, setLang] = useState<SupportedLanguage>('en');
   const [profile, setProfile] = useState<Partial<CitizenProfile>>({});
-  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('chat');
+
+  // ── Restore auth from localStorage on mount ──────────
+  useEffect(() => {
+    const { user: savedUser, token } = loadAuth();
+    if (savedUser && token) {
+      setUser(savedUser);
+      // Apply user's preferred language
+      if (savedUser.preferred_language) {
+        setLang(savedUser.preferred_language as SupportedLanguage);
+      }
+    }
+  }, []);
+
+  // ── Health check on entering app ─────────────────────
+  useEffect(() => {
+    if (view !== 'app') return;
+    setHealthLoading(true);
+    checkHealth()
+      .then((data) => { setHealth(data); setHealthLoading(false); })
+      .catch(() => { setHasError(true); setHealthLoading(false); });
+  }, [view]);
+
+  const handleAuthSuccess = (u: User, token: string) => {
+    setUser(u);
+    saveAuth(token, u);
+    if (u.preferred_language) setLang(u.preferred_language as SupportedLanguage);
+    setView('app');
+  };
+
+  const handleLogout = () => {
+    clearAuth();
+    setUser(null);
+    setView('landing');
+  };
+
+  const collectedFieldsCount = Object.values(profile).filter(
+    (v) => v !== null && v !== undefined && v !== ''
+  ).length;
 
   const t = {
     en: {
@@ -27,7 +86,10 @@ export default function App() {
       profileBtn: 'Profile',
       connected: 'Live',
       disconnected: 'Offline',
-      disclaimer: 'Disclaimer: NagrikAI is an informational tool. Decisions on eligibility and benefits are made solely by official government portals and competent authorities. Placeholders marked TODO_VERIFY represent unverified demo data.',
+      disclaimer: 'Disclaimer: NagrikAI is an informational tool. Eligibility decisions are made solely by official government portals and competent authorities. Placeholders marked TODO_VERIFY represent unverified demo data.',
+      memory: 'Memory',
+      logout: 'Log Out',
+      loginBtn: 'Log In',
     },
     hi: {
       title: 'नागरिक AI',
@@ -35,7 +97,10 @@ export default function App() {
       profileBtn: 'प्रोफ़ाइल',
       connected: 'लाइव',
       disconnected: 'ऑफ़लाइन',
-      disclaimer: 'अस्वीकरण: नागरिक AI केवल सूचनात्मक मार्गदर्शन प्रदान करता है। पात्रता और लाभों पर अंतिम निर्णय केवल आधिकारिक सरकारी पोर्टल और संबंधित प्राधिकरणों द्वारा लिया जाता है। TODO_VERIFY चिह्नित डेटा केवल डेमो के लिए है।',
+      disclaimer: 'अस्वीकरण: नागरिक AI केवल सूचनात्मक मार्गदर्शन प्रदान करता है। पात्रता और लाभों पर अंतिम निर्णय केवल आधिकारिक सरकारी पोर्टल और संबंधित प्राधिकरणों द्वारा लिया जाता है।',
+      memory: 'मेमोरी',
+      logout: 'लॉग आउट',
+      loginBtn: 'लॉग इन',
     },
     mr: {
       title: 'नागरिक AI',
@@ -43,34 +108,48 @@ export default function App() {
       profileBtn: 'प्रोफाइल',
       connected: 'लाइव्ह',
       disconnected: 'ऑफलाइन',
-      disclaimer: 'अस्वीकरण: नागरिक AI केवळ माहितीच्या उद्देशाने आहे. पात्रतेबाबतचा अंतिम निर्णय अधिकृत सरकारी पोर्टलचा असेल. TODO_VERIFY चिन्हांकित डेटा हा केवळ प्रात्यक्षिकासाठी आहे.',
+      disclaimer: 'अस्वीकरण: नागरिक AI केवळ माहितीच्या उद्देशाने आहे. पात्रतेबाबतचा अंतिम निर्णय अधिकृत सरकारी पोर्टलचा असेल.',
+      memory: 'मेमरी',
+      logout: 'लॉग आउट',
+      loginBtn: 'लॉग इन',
     },
   }[lang];
 
-  useEffect(() => {
-    checkHealth()
-      .then((data) => {
-        setHealth(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setHasError(true);
-        setLoading(false);
-      });
-  }, []);
+  // ── Landing view ──────────────────────────────────────
+  if (view === 'landing') {
+    return (
+      <>
+        <LandingPage
+          language={lang}
+          onLanguageChange={setLang}
+          onGetStarted={() => {
+            if (user) setView('app');
+            else setAuthModal({ open: true, tab: 'signup' });
+          }}
+          onLogin={() => setAuthModal({ open: true, tab: 'login' })}
+        />
+        <AuthModal
+          isOpen={authModal.open}
+          onClose={() => setAuthModal({ open: false, tab: 'login' })}
+          onAuthSuccess={handleAuthSuccess}
+          language={lang}
+          initialTab={authModal.tab}
+        />
+      </>
+    );
+  }
 
-  const collectedFieldsCount = Object.values(profile).filter(
-    (v) => v !== null && v !== undefined && v !== ''
-  ).length;
-
+  // ── App view ──────────────────────────────────────────
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Header */}
       <header className="border-b border-slate-200 bg-white sticky top-0 z-30 shadow-xs">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo & Brand */}
-          <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setView('landing')}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
               न
             </div>
@@ -83,13 +162,23 @@ export default function App() {
               </h1>
               <p className="text-xs text-slate-500 hidden sm:block">{t.subtitle}</p>
             </div>
-          </div>
+          </button>
 
-          {/* Controls: Language + Profile Drawer + Health */}
-          <div className="flex items-center space-x-3">
+          {/* Controls */}
+          <div className="flex items-center space-x-2">
             <LanguageSwitcher currentLanguage={lang} onLanguageChange={setLang} />
 
-            {/* Profile Drawer Toggle Button */}
+            {/* Memory button (Phase 10) */}
+            <button
+              onClick={() => setIsMemoryOpen(true)}
+              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-violet-50 hover:border-violet-300 text-xs font-semibold text-slate-700 shadow-xs transition-colors"
+              title={t.memory}
+            >
+              <Brain className="w-3.5 h-3.5 text-violet-600" />
+              <span className="hidden sm:inline">{t.memory}</span>
+            </button>
+
+            {/* Profile button */}
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
               className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 shadow-xs transition-colors"
@@ -103,10 +192,34 @@ export default function App() {
               )}
             </button>
 
+            {/* Auth button */}
+            {user ? (
+              <div className="flex items-center space-x-2">
+                <span className="hidden sm:block text-xs text-slate-600 font-medium max-w-24 truncate">
+                  {user.name}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 rounded-xl border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-slate-500 hover:text-rose-600 transition-colors"
+                  title={t.logout}
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setAuthModal({ open: true, tab: 'login' })}
+                className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>{t.loginBtn}</span>
+              </button>
+            )}
+
             {/* Health pill */}
             <div className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-[11px] font-medium border bg-white">
-              {loading ? (
-                <span className="text-slate-400 animate-pulse">Checking...</span>
+              {healthLoading ? (
+                <span className="text-slate-400 animate-pulse">...</span>
               ) : health?.status === 'healthy' && !hasError ? (
                 <span className="flex items-center text-emerald-700 font-medium">
                   <CheckCircle2 className="w-3 h-3 text-emerald-600 mr-1" />
@@ -164,7 +277,7 @@ export default function App() {
             >
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>
-                {lang === 'hi' ? 'नागरिक वॉल्ट' : lang === 'mr' ? 'नागरिक व्हॉल्ट' : 'NagrikVault (Locker)'}
+                {lang === 'hi' ? 'नागरिक वॉल्ट' : lang === 'mr' ? 'नागरिक व्हॉल्ट' : 'NagrikVault'}
               </span>
             </button>
           </div>
@@ -177,6 +290,7 @@ export default function App() {
               language={lang}
               profile={profile}
               onProfileUpdate={(updated) => setProfile((prev) => ({ ...prev, ...updated }))}
+              userId={user?.id ?? null}
             />
           ) : activeTab === 'notice' ? (
             <div className="h-full overflow-y-auto">
@@ -201,7 +315,24 @@ export default function App() {
           isOpen={isProfileOpen}
           onClose={() => setIsProfileOpen(false)}
         />
+
+        {/* Memory Panel (Phase 10) */}
+        <MemoryPanel
+          isOpen={isMemoryOpen}
+          onClose={() => setIsMemoryOpen(false)}
+          language={lang}
+          isLoggedIn={!!user}
+        />
       </main>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={authModal.open}
+        onClose={() => setAuthModal({ open: false, tab: 'login' })}
+        onAuthSuccess={handleAuthSuccess}
+        language={lang}
+        initialTab={authModal.tab}
+      />
 
       {/* Persistent Disclaimer Footer */}
       <footer className="border-t border-slate-200 bg-white py-2.5 px-4 text-center text-[11px] text-slate-500">

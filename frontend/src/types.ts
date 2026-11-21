@@ -71,6 +71,30 @@ export interface ChatSchemeItem {
   official_url?: string;
 }
 
+// Phase 10: Memory proposal returned by AI after each chat turn
+export interface MemoryProposal {
+  key: string;
+  proposed_value: any;
+  current_value: any;
+  change_type: 'new' | 'update';
+  reason: string;
+}
+
+// Phase 11: Explanation metadata for the explainability panel
+export interface AnswerExplanation {
+  intent: string;
+  language_detected: string;
+  memory_fields_used: string[];
+  chunks_retrieved: Array<{ title: string; page: number; score: number; preview: string }>;
+  eligibility_operators_fired: Array<{
+    criterion: string;
+    op: string;
+    required_value: any;
+    user_value: any;
+    result: string;
+  }>;
+}
+
 export interface ChatResponse {
   answer: string;
   language: string;
@@ -80,6 +104,8 @@ export interface ChatResponse {
   eligibility: EligibilityResult[];
   citations: Citation[];
   disclaimer: string;
+  memory_proposals?: MemoryProposal[];
+  explanation?: AnswerExplanation | null;
 }
 
 export interface ChatMessage {
@@ -92,6 +118,9 @@ export interface ChatMessage {
   eligibility?: EligibilityResult[];
   citations?: Citation[];
   clarifying_question?: string | null;
+  memory_proposals?: MemoryProposal[];
+  explanation?: AnswerExplanation | null;
+  usedMemory?: boolean;
 }
 
 export type SupportedLanguage = 'en' | 'hi' | 'mr';

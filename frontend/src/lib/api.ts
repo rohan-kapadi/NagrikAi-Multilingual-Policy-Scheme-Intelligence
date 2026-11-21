@@ -1,4 +1,5 @@
 import type { ChatResponse, CitizenProfile, EligibilityResult, Scheme } from '../types';
+import { getAuthHeaders } from './auth';
 
 export interface HealthStatus {
   status: string;
@@ -18,15 +19,18 @@ export async function checkHealth(): Promise<HealthStatus> {
 export async function sendChatMessage(
   sessionId: string,
   message: string,
-  language: string
+  language: string,
+  userId?: string | null
 ): Promise<ChatResponse> {
   const res = await fetch('/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
     body: JSON.stringify({
       session_id: sessionId,
       message,
-      language
+      language,
+      // Pass user_id so the backend loads persistent memory
+      ...(userId ? { user_id: userId } : {}),
     })
   });
   if (!res.ok) {

@@ -1,24 +1,28 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, RotateCcw } from 'lucide-react';
-import type { ChatMessage, CitizenProfile, SupportedLanguage } from '../types';
+import type { ChatMessage, CitizenProfile, SupportedLanguage, MemoryProposal } from '../types';
 import { MessageBubble } from './MessageBubble';
 import { VoiceButton } from './VoiceButton';
 import { sendChatMessage, resetSessionProfile } from '../lib/api';
+import { MemoryProposalToast } from './MemoryProposalToast';
 
 interface ChatWindowProps {
   language: SupportedLanguage;
   profile: Partial<CitizenProfile>;
   onProfileUpdate: (profile: Partial<CitizenProfile>) => void;
+  userId?: string | null;
 }
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({
   language,
   onProfileUpdate,
+  userId,
 }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [sessionId] = useState(() => `session_${Date.now()}`);
+  const [pendingProposals, setPendingProposals] = useState<MemoryProposal[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const t = {
@@ -84,7 +88,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     setLoading(true);
 
     try {
-      const response = await sendChatMessage(sessionId, text.trim(), language);
+      const response = await sendChatMessage(sessionId, text.trim(), language, userId);
 
       const assistantMsg: ChatMessage = {
         id: `msg_${Date.now() + 1}`,
@@ -96,11 +100,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         eligibility: response.eligibility,
         citations: response.citations,
         clarifying_question: response.clarifying_question,
+        memory_proposals: response.memory_proposals,
+        explanation: response.explanation,
+        usedMemory: (response.explanation?.memory_fields_used?.length ?? 0) > 0,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
       if (response.profile) {
         onProfileUpdate(response.profile);
+      }
+      // Show memory proposals toast if any
+      if (response.memory_proposals && response.memory_proposals.length > 0 && userId) {
+        setPendingProposals(response.memory_proposals);
       }
     } catch (err: any) {
       console.error(err);
@@ -119,6 +130,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const handleReset = async () => {
     await resetSessionProfile(sessionId);
     setMessages([]);
+    setPendingProposals([]);
     onProfileUpdate({});
   };
 
@@ -184,6 +196,16 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Memory Proposal Toast (Phase 10) */}
+      {pendingProposals.length > 0 && userId && (
+        <MemoryProposalToast
+          proposals={pendingProposals}
+          language={language}
+          onDismissAll={() => setPendingProposals([])}
+          onProposalHandled={(key) => setPendingProposals((prev) => prev.filter((p) => p.key !== key))}
+        />
+      )}
 
       {/* Input container */}
       <div className="pt-3">

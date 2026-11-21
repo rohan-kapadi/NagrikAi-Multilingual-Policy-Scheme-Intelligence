@@ -70,6 +70,8 @@ class ChatRequest(BaseModel):
     session_id: str = "default"
     message: str
     language: str = "en"
+    # Optional: if provided, memory is loaded and proposals are computed
+    user_id: Optional[str] = None
 
 
 class ChatSchemeItem(BaseModel):
@@ -86,6 +88,22 @@ class Citation(BaseModel):
     url: str
 
 
+class MemoryProposal(BaseModel):
+    key: str
+    proposed_value: Any
+    current_value: Optional[Any] = None
+    change_type: str  # "new" | "update"
+    reason: str
+
+
+class AnswerExplanation(BaseModel):
+    intent: str
+    language_detected: str
+    memory_fields_used: List[str] = Field(default_factory=list)
+    chunks_retrieved: List[Dict[str, Any]] = Field(default_factory=list)
+    eligibility_operators_fired: List[Dict[str, Any]] = Field(default_factory=list)
+
+
 class ChatResponse(BaseModel):
     answer: str
     language: str = "en"
@@ -95,3 +113,7 @@ class ChatResponse(BaseModel):
     eligibility: List[EligibilityResult] = Field(default_factory=list)
     citations: List[Citation] = Field(default_factory=list)
     disclaimer: str = ""
+    # Phase 10: Negotiated Memory proposals
+    memory_proposals: List[MemoryProposal] = Field(default_factory=list)
+    # Phase 11: Explainability
+    explanation: Optional[AnswerExplanation] = None

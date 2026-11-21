@@ -1,9 +1,10 @@
 import React from 'react';
-import { Bot, User, HelpCircle } from 'lucide-react';
+import { Bot, User, HelpCircle, Brain } from 'lucide-react';
 import type { ChatMessage } from '../types';
 import { SchemeCard } from './SchemeCard';
 import { CitationList } from './CitationList';
 import { ListenButton } from './ListenButton';
+import { ExplainPanel } from './ExplainPanel';
 
 const CLARIFY_HEADER: Record<string, string> = {
   en: 'Missing Profile Information',
@@ -17,6 +18,9 @@ interface MessageBubbleProps {
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isUser = message.sender === 'user';
+  const lang = message.language || 'en';
+  const usedMemory = message.usedMemory ||
+    (message.explanation && message.explanation.memory_fields_used.length > 0);
 
   return (
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} my-3`}>
@@ -38,6 +42,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               : 'bg-white text-slate-800 border border-slate-200 shadow-xs rounded-tl-xs'
           }`}
         >
+          {/* Memory indicator badge */}
+          {!isUser && usedMemory && (
+            <div className="flex items-center space-x-1 mb-2">
+              <span className="inline-flex items-center space-x-1 text-[10px] font-semibold bg-violet-50 text-violet-700 border border-violet-200 px-1.5 py-0.5 rounded-full">
+                <Brain className="w-2.5 h-2.5" />
+                <span>Using your memory</span>
+              </span>
+            </div>
+          )}
+
           {/* Main message text */}
           <div className="whitespace-pre-wrap">{message.text}</div>
 
@@ -47,7 +61,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               <HelpCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold mb-0.5">
-                  {CLARIFY_HEADER[message.language || 'en'] || CLARIFY_HEADER['en']}
+                  {CLARIFY_HEADER[lang] || CLARIFY_HEADER['en']}
                 </p>
                 <p>{message.clarifying_question}</p>
               </div>
@@ -64,7 +78,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                     key={s.id}
                     scheme={s}
                     eligibility={elig}
-                    language={message.language || 'en'}
+                    language={lang}
                   />
                 );
               })}
@@ -73,7 +87,12 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
           {/* Attached Citations */}
           {message.citations && message.citations.length > 0 && (
-            <CitationList citations={message.citations} language={message.language || 'en'} />
+            <CitationList citations={message.citations} language={lang} />
+          )}
+
+          {/* Explainability panel (Phase 11) */}
+          {!isUser && message.explanation && (
+            <ExplainPanel explanation={message.explanation} language={lang as any} />
           )}
 
           {/* Bubble footer with timestamp and Listen button */}
@@ -82,7 +101,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
               isUser ? 'border-emerald-500/30 text-emerald-100 justify-end' : 'border-slate-100 text-slate-400'
             }`}
           >
-            {!isUser && <ListenButton text={message.text} language={message.language || 'en'} />}
+            {!isUser && <ListenButton text={message.text} language={lang} />}
             <span>{message.timestamp}</span>
           </div>
         </div>
