@@ -1,0 +1,148 @@
+{
+  "id": "mahadbt-tuition-exam-fees",
+  "name": {
+    "en": "Tuition Fees and Examination Fees to VJNT, SBC and OBC Students (MahaDBT)",
+    "hi": "विमुक्त जाति, घुमंतू जनजाति, अन्य पिछड़ा वर्ग और विशेष पिछड़ा वर्ग के छात्रों के लिए शिक्षण एवं परीक्षा शुल्क प्रतिपूर्ति योजना (MahaDBT)",
+    "mr": "विमुक्त जाती, भटक्या जमाती, इतर मागास वर्ग आणि विशेष मागास प्रवर्ग विद्यार्थ्यांसाठी शिक्षण शुल्क व परीक्षा शुल्क प्रतिपूर्ती योजना (महाडीबीटी)"
+  },
+  "level": "state",
+  "state": "Maharashtra",
+  "category": ["education", "scholarship", "fee_reimbursement"],
+  "summary": {
+    "en": "Maharashtra state scheme on MahaDBT providing 50% to 100% tuition and examination fee reimbursement for post-matric VJNT, SBC, and OBC students.",
+    "hi": "महाडीबीटी (MahaDBT) पोर्टल के तहत महाराष्ट्र सरकार की योजना जो पोस्ट-मैट्रिक VJNT, SBC और OBC विद्यार्थियों को 50% से 100% शिक्षण और परीक्षा शुल्क प्रतिपूर्ति प्रदान करती है।",
+    "mr": "महाडीबीटी (MahaDBT) पोर्टलद्वारे महाराष्ट्र शासनाची योजना, ज्यामध्ये इयत्ता 10वीनंतरच्या मान्यताप्राप्त अभ्यासक्रमांसाठी व्हीजेएनटी, एसबीसी आणि ओबीसी विद्यार्थ्यांना 50% ते 100% शिक्षण व परीक्षा शुल्क प्रतिपूर्ती दिली जाते."
+  },
+  "benefits": {
+    "en": "100% reimbursement of tuition and examination fees for government and aided colleges, and 50% to 100% reimbursement for approved unaided/private professional courses.",
+    "hi": "सरकारी और सहायता प्राप्त महाविद्यालयों में 100% शिक्षण और परीक्षा शुल्क की प्रतिपूर्ति, तथा मान्यता प्राप्त गैर-अनुदानित/निजी व्यावसायिक पाठ्यक्रमों के लिए 50% से 100% शुल्क प्रतिपूर्ति।",
+    "mr": "शासकीय व अनुदानित महाविद्यालयांमध्ये 100% शिक्षण शुल्क व परीक्षा शुल्क प्रतिपूर्ती, आणि शासनमान्य विनाअनुदानित/खाजगी व्यावसायिक अभ्यासक्रमांसाठी 50% ते 100% शुल्क प्रतिपूर्ती."
+  },
+  "criteria": [
+    {
+      "id": "c1",
+      "label": {
+        "en": "Occupation must be student",
+        "hi": "व्यवसाय छात्र होना चाहिए",
+        "mr": "व्यवसाय विद्यार्थी असावा"
+      },
+      "field": "occupation",
+      "op": "eq",
+      "value": "student",
+      "source_ref": "mahadbt_vjnt_obc_guidelines_p1"
+    },
+    {
+      "id": "c2",
+      "label": {
+        "en": "Must belong to OBC, VJNT (VJ/NT), or SBC category of Maharashtra",
+        "hi": "महाराष्ट्र के ओबीसी (OBC), वीजेएनटी (VJNT) या एसबीसी (SBC) प्रवर्ग से होना चाहिए",
+        "mr": "महाराष्ट्रातील इतर मागास वर्ग (OBC), विमुक्त जाती/भटक्या जमाती (VJNT) किंवा विशेष मागास प्रवर्ग (SBC) असावा"
+      },
+      "field": "caste_category",
+      "op": "in",
+      "value": ["obc", "vjnt", "sbc", "nt", "vj", "jnt"],
+      "source_ref": "mahadbt_vjnt_obc_guidelines_p2"
+    },
+    {
+      "id": "c3",
+      "label": {
+        "en": "Annual family income must not exceed Rs 8,00,000 (8 Lakhs)",
+        "hi": "पारिवारिक वार्षिक आय ₹8,00,000 (8 लाख) से अधिक नहीं होनी चाहिए",
+        "mr": "कौटुंबिक वार्षिक उत्पन्न ₹8,00,000 (8 लाख) पेक्षा जास्त नसावे"
+      },
+      "field": "annual_family_income",
+      "op": "lte",
+      "value": 800000,
+      "source_ref": "mahadbt_vjnt_obc_guidelines_p3"
+    },
+    {
+      "id": "c4",
+      "label": {
+        "en": "Must be resident/domicile of Maharashtra",
+        "hi": "महाराष्ट्र का अधिवासी (Domicile) होना चाहिए",
+        "mr": "महाराष्ट्र राज्याचा रहिवासी / अधिवास (Domicile) असावा"
+      },
+      "field": "state",
+      "op": "eq",
+      "value": "Maharashtra",
+      "source_ref": "mahadbt_vjnt_obc_guidelines_p4"
+    },
+    {
+      "id": "c5",
+      "label": {
+        "en": "Current education level must be Class 12, Graduate, or Postgraduate",
+        "hi": "शिक्षा स्तर 12वीं, स्नातक या स्नातकोत्तर होना चाहिए",
+        "mr": "शिक्षणाचा स्तर 12वी, पदवी किंवा पदव्युत्तर असावा"
+      },
+      "field": "education_level",
+      "op": "in",
+      "value": ["class_12", "graduate", "postgraduate"],
+      "source_ref": "mahadbt_vjnt_obc_guidelines_p5"
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "e1",
+      "label": {
+        "en": "Family income exceeds Rs 8,00,000 per annum",
+        "hi": "पारिवारिक आय प्रति वर्ष ₹8,00,000 से अधिक है",
+        "mr": "कौटुंबिक वार्षिक उत्पन्न ₹8,00,000 पेक्षा जास्त आहे"
+      },
+      "field": "annual_family_income",
+      "op": "gt",
+      "value": 800000,
+      "source_ref": "mahadbt_vjnt_obc_guidelines_p6"
+    }
+  ],
+  "required_documents": [
+    {
+      "en": "Domicile Certificate of Maharashtra State",
+      "hi": "महाराष्ट्र राज्य का अधिवास प्रमाण पत्र (Domicile Certificate)",
+      "mr": "महाराष्ट्र राज्याचे अधिवास प्रमाणपत्र (Domicile Certificate)"
+    },
+    {
+      "en": "Caste Certificate (VJNT / SBC / OBC issued by Govt of Maharashtra)",
+      "hi": "जाति प्रमाण पत्र (OBC / VJNT / SBC महाराष्ट्र सरकार द्वारा जारी)",
+      "mr": "जात प्रमाणपत्र (महाराष्ट्र शासनाने दिलेले OBC / VJNT / SBC)"
+    },
+    {
+      "en": "Non-Creamy Layer (NCL) Certificate valid for the current academic year",
+      "hi": "चालू शैक्षणिक वर्ष के लिए वैध नॉन-क्रीमी लेयर (NCL) प्रमाण पत्र",
+      "mr": "चालू शैक्षणिक वर्षासाठी वैध नॉन-क्रिमीलेअर (NCL) प्रमाणपत्र"
+    },
+    {
+      "en": "Income Certificate issued by Tahsildar / Sub-Divisional Officer (Annual Income <= 8 Lakh)",
+      "hi": "तहसीलदार द्वारा जारी आय प्रमाण पत्र (वार्षिक आय <= 8 लाख)",
+      "mr": "तहसीलदारांनी दिलेला उत्पन्नाचा दाखला (वार्षिक उत्पन्न <= 8 लाख)"
+    },
+    {
+      "en": "SSC (Class 10) & HSC (Class 12) / Previous Year passing mark sheet",
+      "hi": "10वीं व 12वीं अथवा पिछले वर्ष की उत्तीर्ण अंकतालिका",
+      "mr": "10वी व 12वी किंवा मागील वर्षाची उत्तीर्ण गुणपत्रिका"
+    },
+    {
+      "en": "College Admission Fee Receipt and Allotment Letter (CAP Allotment for professional courses)",
+      "hi": "कॉलेज प्रवेश शुल्क रसीद एवं कैप आवंटन पत्र (CAP Allotment)",
+      "mr": "महाविद्यालयीन प्रवेश शुल्क पावती व कॅप वाटप पत्र (CAP Allotment Letter)"
+    },
+    {
+      "en": "Aadhaar linked Bank Account Passbook",
+      "hi": "आधार लिंक बैंक खाता पासबुक प्रति",
+      "mr": "आधार संलग्न बँक खाते पासबुक प्रत"
+    }
+  ],
+  "how_to_apply": {
+    "en": "Apply online on the official MahaDBT portal (https://mahadbt.maharashtra.gov.in). Register under 'Post Matric Scholarship', choose 'OBC, SEBC, VJNT & SBC Welfare Department', select 'Payment of Tuition Fees & Examination Fees for VJNT/SBC/OBC Students', and upload documents.",
+    "hi": "आधिकारिक महाडीबीटी पोर्टल (https://mahadbt.maharashtra.gov.in) पर ऑनलाइन आवेदन करें। 'Post Matric Scholarship' में पंजीकरण करें, 'OBC, SEBC, VJNT & SBC Welfare Department' चुनें, योजना का चयन करें और दस्तावेज अपलोड करें।",
+    "mr": "अधिकृत महाडीबीटी पोर्टलवर (https://mahadbt.maharashtra.gov.in) ऑनलाइन अर्ज करा. 'Post Matric Scholarship' अंतर्गत नोंदणी करा, 'इतर मागास बहुजन कल्याण विभाग' निवडा आणि आवश्यक कागदपत्रे अपलोड करून अर्ज सादर करा."
+  },
+  "official_url": "https://mahadbt.maharashtra.gov.in",
+  "source_documents": [
+    {
+      "title": "MahaDBT Official Portal — Tuition Fees & Examination Fees Scheme for VJNT, SBC & OBC",
+      "url": "https://mahadbt.maharashtra.gov.in/SchemeData/SchemeData?str=E9DDFA703C38E51AA8F7B5FEEC895EE1",
+      "retrieved_on": "2026-11-21"
+    }
+  ],
+  "verified": true
+}

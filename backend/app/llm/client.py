@@ -145,7 +145,7 @@ class LLMClient:
         # --- Occupation ---
         if any(w in text_lower for w in ["kisan", "kisaan", "farmer", "शेतकरी", "किसान", "kheti", "खेती", "शेती"]):
             extracted["occupation"] = "farmer"
-        elif any(w in text_lower for w in ["student", "vidyarthi", "विद्यार्थी", "छात्र", "college", "school", "padhta", "padh raha"]):
+        elif any(w in text_lower for w in ["student", "vidyarthi", "विद्यार्थी", "छात्र", "college", "school", "padhta", "padh raha", "tuition", "tution", "examination fee", "exam fee", "scholarship", "शिष्यवृत्ती"]):
             extracted["occupation"] = "student"
         elif any(w in text_lower for w in ["mazdoor", "worker", "मजदूर", "कामगार", "labour", "labourer"]):
             extracted["occupation"] = "worker"
@@ -244,7 +244,11 @@ class LLMClient:
             extracted["education_level"] = "class_10"
 
         # --- Caste category ---
-        if any(w in text_lower for w in ["obc", "ओबीसी", "other backward"]):
+        if any(w in text_lower for w in ["vjnt", "vj/nt", "jnt", "विमुक्त", "भटक्या"]):
+            extracted["caste_category"] = "vjnt"
+        elif any(w in text_lower for w in ["sbc", "विशेष मागास"]):
+            extracted["caste_category"] = "sbc"
+        elif any(w in text_lower for w in ["obc", "ओबीसी", "other backward"]):
             extracted["caste_category"] = "obc"
         elif any(w in text_lower for w in [" sc ", "scheduled caste", "अनुसूचित जाति", "dalit"]):
             extracted["caste_category"] = "sc"

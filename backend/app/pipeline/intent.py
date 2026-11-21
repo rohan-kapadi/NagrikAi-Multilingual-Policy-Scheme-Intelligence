@@ -5,12 +5,30 @@ from backend.app.llm.prompts import INTENT_CLASSIFICATION_PROMPT
 
 # Scheme keyword → id mapping, easy to extend as more schemes are added
 SCHEME_KEYWORDS: Dict[str, str] = {
+    # MahaDBT Tuition & Exam Fees (OBC/VJNT/SBC) - match specific before generic scholarship
+    "tuition fee": "mahadbt-tuition-exam-fees",
+    "tution fee": "mahadbt-tuition-exam-fees",
+    "examination fee": "mahadbt-tuition-exam-fees",
+    "exam fee": "mahadbt-tuition-exam-fees",
+    "fee reimbursement": "mahadbt-tuition-exam-fees",
+    "mahadbt": "mahadbt-tuition-exam-fees",
+    "maha dbt": "mahadbt-tuition-exam-fees",
+    "vjnt": "mahadbt-tuition-exam-fees",
+    "jnt": "mahadbt-tuition-exam-fees",
+    "sbc": "mahadbt-tuition-exam-fees",
+    "शिक्षण शुल्क": "mahadbt-tuition-exam-fees",
+    "परीक्षा शुल्क": "mahadbt-tuition-exam-fees",
+    "महाडीबीटी": "mahadbt-tuition-exam-fees",
+
+    # PM Kisan
     "pm-kisan": "pm-kisan",
     "pm kisan": "pm-kisan",
     "kisan samman": "pm-kisan",
     "किसान सम्मान": "pm-kisan",
     "पीएम किसान": "pm-kisan",
     "पीएम-किसान": "pm-kisan",
+
+    # Central NSP Scholarship
     "scholarship": "post-matric-scholarship",
     "post matric": "post-matric-scholarship",
     "post-matric": "post-matric-scholarship",
