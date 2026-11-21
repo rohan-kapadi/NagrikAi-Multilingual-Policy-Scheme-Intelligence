@@ -21,11 +21,18 @@ type ActiveTab = 'chat' | 'notice' | 'vault';
 type AppView = 'landing' | 'app';
 
 export default function App() {
-  // ── Routing ───────────────────────────────────────────
-  const [view, setView] = useState<AppView>('landing');
+  // ── Auth & Session Restoration ─────────────────────────
+  const [user, setUser] = useState<User | null>(() => {
+    const { user: savedUser, token } = loadAuth();
+    return savedUser && token ? savedUser : null;
+  });
 
-  // ── Auth ─────────────────────────────────────────────
-  const [user, setUser] = useState<User | null>(null);
+  // ── Routing (Restores 'app' view immediately if user is already logged in) ──
+  const [view, setView] = useState<AppView>(() => {
+    const { user: savedUser, token } = loadAuth();
+    return savedUser && token ? 'app' : 'landing';
+  });
+
   const [authModal, setAuthModal] = useState<{ open: boolean; tab: 'login' | 'signup' }>({
     open: false,
     tab: 'login',
@@ -35,23 +42,17 @@ export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [healthLoading, setHealthLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [lang, setLang] = useState<SupportedLanguage>('en');
+  const [lang, setLang] = useState<SupportedLanguage>(() => {
+    const { user: savedUser } = loadAuth();
+    if (savedUser?.preferred_language && ['en', 'hi', 'mr'].includes(savedUser.preferred_language)) {
+      return savedUser.preferred_language as SupportedLanguage;
+    }
+    return 'en';
+  });
   const [profile, setProfile] = useState<Partial<CitizenProfile>>({});
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMemoryOpen, setIsMemoryOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('chat');
-
-  // ── Restore auth from localStorage on mount ──────────
-  useEffect(() => {
-    const { user: savedUser, token } = loadAuth();
-    if (savedUser && token) {
-      setUser(savedUser);
-      // Apply user's preferred language
-      if (savedUser.preferred_language) {
-        setLang(savedUser.preferred_language as SupportedLanguage);
-      }
-    }
-  }, []);
 
   // ── Health check on entering app ─────────────────────
   useEffect(() => {
@@ -65,7 +66,9 @@ export default function App() {
   const handleAuthSuccess = (u: User, token: string) => {
     setUser(u);
     saveAuth(token, u);
-    if (u.preferred_language) setLang(u.preferred_language as SupportedLanguage);
+    if (u.preferred_language && ['en', 'hi', 'mr'].includes(u.preferred_language)) {
+      setLang(u.preferred_language as SupportedLanguage);
+    }
     setView('app');
   };
 
@@ -122,11 +125,16 @@ export default function App() {
         <LandingPage
           language={lang}
           onLanguageChange={setLang}
+          isLoggedIn={!!user}
+          userName={user?.name}
           onGetStarted={() => {
             if (user) setView('app');
             else setAuthModal({ open: true, tab: 'signup' });
           }}
-          onLogin={() => setAuthModal({ open: true, tab: 'login' })}
+          onLogin={() => {
+            if (user) setView('app');
+            else setAuthModal({ open: true, tab: 'login' });
+          }}
         />
         <AuthModal
           isOpen={authModal.open}

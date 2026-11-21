@@ -10,6 +10,8 @@ interface LandingPageProps {
   onLogin: () => void;
   language: SupportedLanguage;
   onLanguageChange: (lang: SupportedLanguage) => void;
+  isLoggedIn?: boolean;
+  userName?: string;
 }
 
 const LANG_OPTIONS: { code: SupportedLanguage; label: string; native: string }[] = [
@@ -109,7 +111,7 @@ const HERO = {
 };
 
 export const LandingPage: React.FC<LandingPageProps> = ({
-  onGetStarted, onLogin, language, onLanguageChange,
+  onGetStarted, onLogin, language, onLanguageChange, isLoggedIn = false, userName
 }) => {
   const hero = HERO[language];
   const steps = STEPS[language];
@@ -150,13 +152,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               onClick={onLogin}
               className="text-xs font-semibold text-slate-600 hover:text-emerald-700 px-3 py-1.5 rounded-xl hover:bg-emerald-50 transition-colors"
             >
-              {hero.login}
+              {isLoggedIn ? (userName ? `${userName}` : 'Dashboard') : hero.login}
             </button>
             <button
               onClick={onGetStarted}
               className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm transition-colors flex items-center space-x-1.5"
             >
-              <span>{hero.cta}</span>
+              <span>{isLoggedIn ? (language === 'hi' ? 'ऐप खोलें' : language === 'mr' ? 'अ‍ॅप उघडा' : 'Open App') : hero.cta}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
