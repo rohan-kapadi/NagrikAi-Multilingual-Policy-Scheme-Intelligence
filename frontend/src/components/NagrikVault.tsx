@@ -9,7 +9,9 @@ import {
   Check, 
   Sparkles, 
   ExternalLink,
-  KeyRound
+  KeyRound,
+  Download,
+  Info
 } from 'lucide-react';
 import type { CitizenProfile, SupportedLanguage } from '../types';
 
@@ -55,6 +57,7 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
   const [copiedHash, setCopiedHash] = useState<string | null>(null);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const t = {
@@ -256,10 +259,20 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <a
+            href="/nagrik-copilot-extension.zip"
+            download="nagrik-copilot-extension.zip"
+            className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition-colors shadow-xs"
+            title={t.downloadExtension}
+          >
+            <Download className="w-3.5 h-3.5 text-emerald-700" />
+            <span>{t.downloadExtension}</span>
+          </a>
+
           <button
             onClick={handleSyncToExtension}
-            className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors shadow-xs"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors shadow-xs"
           >
             {syncSuccess ? (
               <>
@@ -285,6 +298,45 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
             <span className="hidden md:inline">{t.testDemoPortal}</span>
           </a>
         </div>
+      </div>
+
+      {/* Quick Setup Instructions Helper */}
+      <div className="mb-6 -mt-3 text-right">
+        <button
+          onClick={() => setShowInstallGuide(!showInstallGuide)}
+          className="text-xs text-emerald-700 hover:text-emerald-800 hover:underline inline-flex items-center space-x-1 font-medium cursor-pointer"
+        >
+          <Info className="w-3.5 h-3.5" />
+          <span>
+            {language === 'hi'
+              ? 'ब्राउज़र एक्सटेंशन कैसे इंस्टॉल करें? (मार्गदर्शिका)'
+              : language === 'mr'
+              ? 'ब्राउझर एक्स्टेंशन कसे इन्स्टॉल करावे? (मार्गदर्शक)'
+              : 'How to install the browser extension? (Quick Guide)'}
+          </span>
+        </button>
+
+        {showInstallGuide && (
+          <div className="mt-2 text-left bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 text-xs text-slate-700 shadow-xs space-y-2">
+            <h4 className="font-bold text-slate-900 flex items-center space-x-1.5">
+              <span>🚀 3-Step Chrome / Edge / Brave Installation:</span>
+            </h4>
+            <ol className="list-decimal list-inside space-y-1 text-slate-600 ml-1">
+              <li>
+                <strong>Download & Unzip:</strong> Click the <em>"{t.downloadExtension}"</em> button above (or use the existing <code className="bg-white px-1.5 py-0.5 rounded text-emerald-800 border border-emerald-200">extension/</code> folder in the project root).
+              </li>
+              <li>
+                <strong>Open Extensions:</strong> In Chrome, Brave, or Edge, navigate to <code className="bg-white px-1.5 py-0.5 rounded text-emerald-800 border border-emerald-200">chrome://extensions</code> and turn <strong>ON "Developer mode"</strong> in the top-right corner.
+              </li>
+              <li>
+                <strong>Load Unpacked:</strong> Click the <strong>"Load unpacked"</strong> button in top-left, and select the extracted extension folder.
+              </li>
+            </ol>
+            <p className="text-[11px] text-emerald-800 pt-1 border-t border-emerald-200/60">
+              💡 <em>Once loaded, pin <strong>Nagrik Copilot</strong> in your browser toolbar. Then click "Sync with Browser Extension" and open any government portal to auto-fill!</em>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Upload Zone */}
