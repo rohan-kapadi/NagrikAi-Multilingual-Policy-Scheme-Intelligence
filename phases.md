@@ -127,7 +127,7 @@ Timeline (submission closes 22 Nov, 11:59 PM): Phases 0–3 by end of 20 Nov, Ph
 
 ---
 
-## Phase 9 — Landing Page + Auth (≈3 hrs)
+## Phase 9 — Landing Page + Auth (≈3 hrs) ✅ DONE
 **Do**
 - **Landing Page** (`/`) — marketing page that sells NagrikAI to visitors:
   - Hero section: headline, subheadline, CTA buttons ("Get Started Free" → signup, "See Demo" → scrolls to demo section).
@@ -156,7 +156,7 @@ Timeline (submission closes 22 Nov, 11:59 PM): Phases 0–3 by end of 20 Nov, Ph
 
 ---
 
-## Phase 10 — Negotiated Memory System (≈4 hrs)
+## Phase 10 — Negotiated Memory System (≈4 hrs) ✅ DONE
 **Do**
 
 The **Negotiated Memory** system gives users full visibility and control over what NagrikAI remembers about them. Unlike the in-session profile, this memory persists across sessions and must be explicitly approved by the user.
@@ -203,7 +203,7 @@ The **Negotiated Memory** system gives users full visibility and control over wh
 
 ---
 
-## Phase 11 — Explainability Layer (≈2 hrs)
+## Phase 11 — Explainability Layer (≈2 hrs) ✅ DONE
 **Do**
 
 Make AI answers more transparent by showing _why_ the AI said what it said.
