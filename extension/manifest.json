@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Nagrik Copilot — Government Scheme Autofill",
+  "version": "1.0.0",
+  "description": "Auto-fill Indian government scheme and DBT applications using your encrypted NagrikVault profile.",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Nagrik Copilot Autofill"
+  },
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.gov.in/*",
+    "*://*.nic.in/*",
+    "*://localhost/*",
+    "*://127.0.0.1/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.gov.in/*",
+        "*://*.nic.in/*",
+        "*://localhost/*",
+        "*://127.0.0.1/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}

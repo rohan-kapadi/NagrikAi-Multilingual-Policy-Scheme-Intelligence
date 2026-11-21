@@ -96,7 +96,22 @@ Timeline (submission closes 22 Nov, 11:59 PM): Phases 0–3 by end of 20 Nov, Ph
 
 **Done when:** a sample government PDF produces an accurate simple-language summary in Hindi with page references.
 
-> If time is short, cut in this order: saved schemes, comparison, then this phase. Do not cut tests, citations or the disclaimer.
+---
+
+## Phase 7b — NagrikVault & Autofill Extension Copilot (P1+, ≈2 hrs)
+**Do**
+- `NagrikVault` frontend component:
+  - Secure document upload zone (Income Certificate, 7/12 Land Record, Caste Certificate, Marksheet).
+  - Client-side cryptographic integrity hashing (SHA-256) & AES-256-GCM encryption demonstration for tamper-proof storage without server exposure.
+  - Automatic extraction of critical fields (land area in hectares, annual family income, category) into the `CitizenProfile` state.
+  - "Sync with Nagrik Copilot" profile bridge.
+- `extension/` Manifest V3 Browser Extension:
+  - `manifest.json`, `popup.html`, `popup.js`, `content.js` for Chromium browsers (Chrome/Edge/Brave).
+  - Matches scheme portals (PM-KISAN, NSP, demo portal).
+  - 1-click "⚡ Auto-Fill Application Form" button that fills citizen inputs (Name, Category, Land Area, Income, State, District, IFSC/Account) with visual confirmation badges and human-in-the-loop validation.
+- Interactive demo portal test page to verify and demonstrate autofill behavior reliably without live captcha obstacles.
+
+**Done when:** uploading an eligibility document parses data directly into the citizen profile with cryptographic hash verification, and the extension auto-fills a scheme application form in one click.
 
 ---
 

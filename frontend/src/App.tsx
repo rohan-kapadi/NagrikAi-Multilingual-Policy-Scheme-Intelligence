@@ -6,9 +6,10 @@ import { ChatWindow } from './components/ChatWindow';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ProfilePanel } from './components/ProfilePanel';
 import { NoticeUpload } from './components/NoticeUpload';
-import { UserCheck, CheckCircle2, AlertCircle, MessageSquare, FileText } from 'lucide-react';
+import { NagrikVault } from './components/NagrikVault';
+import { UserCheck, CheckCircle2, AlertCircle, MessageSquare, FileText, ShieldCheck } from 'lucide-react';
 
-type ActiveTab = 'chat' | 'notice';
+type ActiveTab = 'chat' | 'notice' | 'vault';
 
 export default function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
@@ -153,6 +154,19 @@ export default function App() {
                 {lang === 'hi' ? 'नोटिस विश्लेषक' : lang === 'mr' ? 'नोटीस स्पष्टीकरण' : 'Notice Explainer'}
               </span>
             </button>
+            <button
+              onClick={() => setActiveTab('vault')}
+              className={`flex items-center space-x-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition-colors ${
+                activeTab === 'vault'
+                  ? 'border-emerald-600 text-emerald-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>
+                {lang === 'hi' ? 'नागरिक वॉल्ट' : lang === 'mr' ? 'नागरिक व्हॉल्ट' : 'NagrikVault (Locker)'}
+              </span>
+            </button>
           </div>
         </div>
 
@@ -164,9 +178,17 @@ export default function App() {
               profile={profile}
               onProfileUpdate={(updated) => setProfile((prev) => ({ ...prev, ...updated }))}
             />
-          ) : (
+          ) : activeTab === 'notice' ? (
             <div className="h-full overflow-y-auto">
               <NoticeUpload language={lang} />
+            </div>
+          ) : (
+            <div className="h-full overflow-y-auto">
+              <NagrikVault
+                language={lang}
+                profile={profile}
+                onProfileUpdate={(updated) => setProfile((prev) => ({ ...prev, ...updated }))}
+              />
             </div>
           )}
         </div>

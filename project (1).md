@@ -43,9 +43,11 @@ NagrikAI solves this through one conversational interface (text and voice) in **
 2. Government notice upload (PDF/image) and plain-language explanation.
 3. Scheme comparison (2 schemes side by side).
 4. Saved schemes list.
+5. NagrikVault — Zero-Knowledge client-side encrypted (AES-256-GCM) document locker with SHA-256 cryptographic verification hashes and automated profile extraction (Land 7/12, Income Certificate).
+6. Nagrik Copilot Browser Extension (Manifest V3) — 1-click portal autofill assistant bridging verified citizen profile fields into official government application forms with human review.
 
 ### Out of scope (do NOT build)
-Autonomous form submission, admin panel, multi-user auth, large-scale scraping, mobile app, multi-agent swarms, payments, notifications.
+Autonomous unassisted form submission without human confirmation (assisted autofill with citizen confirmation is supported), admin panel, multi-user auth server, large-scale scraping, mobile app, multi-agent swarms, payments, notifications.
 
 ## 4. Core design principles
 

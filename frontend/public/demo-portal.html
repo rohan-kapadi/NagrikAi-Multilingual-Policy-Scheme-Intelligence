@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National DBT Scheme Portal — Official Online Application</title>
+  <style>
+    :root {
+      --primary: #047857;
+      --primary-dark: #065f46;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #0f172a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: white;
+      border-bottom: 2px solid #047857;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .gov-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .emblem {
+      width: 36px;
+      height: 36px;
+      background: #047857;
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .header-text h1 { font-size: 16px; font-weight: 700; color: #047857; }
+    .header-text p { font-size: 11px; color: #64748b; }
+    
+    .copilot-banner {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 20px auto 0;
+      max-width: 760px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .copilot-banner p { font-size: 13px; color: #065f46; font-weight: 500; }
+    .autofill-btn {
+      background: #047857;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+    .autofill-btn:hover { background: #065f46; }
+
+    main {
+      max-width: 760px;
+      margin: 20px auto 40px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .subtext { font-size: 12px; color: #64748b; margin-bottom: 24px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .full-width { grid-column: 1 / -1; }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label { font-size: 12px; font-weight: 600; color: #334155; }
+    input, select {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
+    }
+    .autofilled-highlight {
+      background-color: #ecfdf5 !important;
+      border-color: #10b981 !important;
+      animation: pulse 1s ease-in-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    .submit-bar {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .submit-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="gov-badge">
+      <div class="emblem">भा</div>
+      <div class="header-text">
+        <h1>Direct Benefit Transfer & Welfare Portal</h1>
+        <p>Ministry of Rural Development & Agriculture • Government of India (Demo Simulation)</p>
+      </div>
+    </div>
+    <span style="font-size: 11px; padding: 4px 8px; border-radius: 6px; background: #f1f5f9; color: #475569; font-weight: 600;">
+      Portal Form v2.4
+    </span>
+  </header>
+
+  <div class="copilot-banner">
+    <div>
+      <p>⚡ <strong>Nagrik Copilot Integration Active</strong></p>
+      <p style="font-size: 11px; color: #047857; font-weight: normal;">
+        1-Click Autofill uses verified data from your client-side encrypted NagrikVault.
+      </p>
+    </div>
+    <button class="autofill-btn" id="autofillTriggerBtn">
+      <span>⚡ Auto-Fill from NagrikVault</span>
+    </button>
+  </div>
+
+  <main>
+    <h2>Farmer & Beneficiary Registration Form</h2>
+    <p class="subtext">Please verify all prefilled details before final submission.</p>
+
+    <form id="schemeApplicationForm">
+      <div class="form-grid">
+        <div class="field-group">
+          <label for="applicant_name">Full Name (as on Land 7/12 Extract)</label>
+          <input type="text" id="applicant_name" name="applicant_name" placeholder="Enter full name">
+        </div>
+
+        <div class="field-group">
+          <label for="occupation">Primary Occupation</label>
+          <select id="occupation" name="occupation">
+            <option value="">Select Occupation</option>
+            <option value="farmer">Farmer / Cultivator</option>
+            <option value="student">Student</option>
+            <option value="worker">Daily Wage Worker</option>
+            <option value="self_employed">Self Employed</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="state">State</label>
+          <input type="text" id="state" name="state" placeholder="e.g. Maharashtra">
+        </div>
+
+        <div class="field-group">
+          <label for="district">District</label>
+          <input type="text" id="district" name="district" placeholder="e.g. Pune">
+        </div>
+
+        <div class="field-group">
+          <label for="land_holding_hectares">Cultivable Land Area (in Hectares)</label>
+          <input type="number" step="0.1" id="land_holding_hectares" name="land_holding_hectares" placeholder="e.g. 1.2">
+        </div>
+
+        <div class="field-group">
+          <label for="annual_family_income">Annual Family Income (₹)</label>
+          <input type="number" id="annual_family_income" name="annual_family_income" placeholder="e.g. 180000">
+        </div>
+
+        <div class="field-group">
+          <label for="caste_category">Social Category</label>
+          <select id="caste_category" name="caste_category">
+            <option value="">Select Category</option>
+            <option value="general">General</option>
+            <option value="obc">OBC</option>
+            <option value="sc">SC</option>
+            <option value="st">ST</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="residence">Area of Residence</label>
+          <select id="residence" name="residence">
+            <option value="">Select Residence</option>
+            <option value="rural">Rural</option>
+            <option value="urban">Urban</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="submit-bar">
+        <button type="button" class="submit-btn" onclick="alert('Demo application submitted with verified NagrikAI profile!')">
+          Submit Official Application
+        </button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    // Autofill listener for demo page & extension bridge
+    function performAutofill(data) {
+      if (!data) return;
+      const mapping = {
+        'applicant_name': data.name || 'Rohan Kapadnis',
+        'occupation': data.occupation || 'farmer',
+        'state': data.state || 'Maharashtra',
+        'district': data.district || 'Pune',
+        'land_holding_hectares': data.land_holding_hectares || 1.2,
+        'annual_family_income': data.annual_family_income || 180000,
+        'caste_category': data.caste_category || 'general',
+        'residence': data.residence || 'rural',
+      };
+
+      let filledCount = 0;
+      Object.keys(mapping).forEach(fieldId => {
+        const input = document.getElementById(fieldId);
+        if (input && mapping[fieldId] !== undefined && mapping[fieldId] !== null) {
+          input.value = mapping[fieldId];
+          input.classList.add('autofilled-highlight');
+          filledCount++;
+        }
+      });
+
+      const btn = document.getElementById('autofillTriggerBtn');
+      if (btn) {
+        btn.innerHTML = '<span>✓ Autofilled ' + filledCount + ' Fields from Vault!</span>';
+        btn.style.background = '#059669';
+      }
+    }
+
+    document.getElementById('autofillTriggerBtn').addEventListener('click', () => {
+      // 1. Read from localStorage if synced
+      let synced = null;
+      try {
+        const raw = localStorage.getItem('nagrik_copilot_profile');
+        if (raw) synced = JSON.parse(raw)?.profile;
+      } catch (e) {}
+
+      // 2. Default to farmer profile if nothing synced yet
+      performAutofill(synced || {
+        occupation: 'farmer',
+        land_holding_hectares: 1.2,
+        district: 'Pune',
+        state: 'Maharashtra',
+        annual_family_income: 180000,
+        residence: 'rural'
+      });
+    });
+
+    // Listen for Extension messages
+    window.addEventListener('message', (event) => {
+      if (event.data && event.data.type === 'NAGRIK_COPILOT_AUTOFILL') {
+        performAutofill(event.data.profile);
+      }
+    });
+  </script>
+</body>
+</html>
