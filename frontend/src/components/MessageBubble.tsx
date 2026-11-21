@@ -1,5 +1,6 @@
 import React from 'react';
 import { Bot, User, HelpCircle, Brain } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import type { ChatMessage } from '../types';
 import { SchemeCard } from './SchemeCard';
 import { CitationList } from './CitationList';
@@ -53,7 +54,68 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           )}
 
           {/* Main message text */}
-          <div className="whitespace-pre-wrap">{message.text}</div>
+          <div className="leading-relaxed space-y-2">
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
+                strong: ({ children }) => (
+                  <strong className={`font-semibold ${isUser ? 'text-white' : 'text-slate-900'}`}>
+                    {children}
+                  </strong>
+                ),
+                em: ({ children }) => <em className="italic">{children}</em>,
+                ul: ({ children }) => (
+                  <ul className="list-disc pl-5 my-2 space-y-1 marker:text-emerald-500">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal pl-5 my-2 space-y-1 marker:text-emerald-500 font-medium">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                h1: ({ children }) => (
+                  <h1 className={`text-base font-bold mt-3 mb-1.5 ${isUser ? 'text-white' : 'text-slate-900'}`}>
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className={`text-sm font-bold mt-2.5 mb-1 ${isUser ? 'text-white' : 'text-slate-900'}`}>
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className={`text-sm font-bold mt-2 mb-1 ${isUser ? 'text-white' : 'text-slate-900'}`}>
+                    {children}
+                  </h3>
+                ),
+                a: ({ href, children }) => (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`underline font-medium hover:opacity-80 transition-opacity ${
+                      isUser ? 'text-emerald-100 hover:text-white' : 'text-emerald-600 hover:text-emerald-700'
+                    }`}
+                  >
+                    {children}
+                  </a>
+                ),
+                code: ({ children }) => (
+                  <code
+                    className={`px-1.5 py-0.5 rounded text-xs font-mono ${
+                      isUser ? 'bg-emerald-700 text-emerald-100' : 'bg-slate-100 text-slate-800 border border-slate-200'
+                    }`}
+                  >
+                    {children}
+                  </code>
+                ),
+              }}
+            >
+              {message.text}
+            </ReactMarkdown>
+          </div>
 
           {/* Clarifying question callout */}
           {message.clarifying_question && (
