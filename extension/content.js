@@ -22,7 +22,8 @@ function autofillForm(profile) {
     matcher.keys.forEach(key => {
       // Look for id, name, or data-field match
       const elements = document.querySelectorAll(
-        `input[id*="${key}" i], input[name*="${key}" i], select[id*="${key}" i], select[name*="${key}" i]`
+        `input[id*="${key}" i], input[name*="${key}" i], input[placeholder*="${key}" i], ` +
+        `select[id*="${key}" i], select[name*="${key}" i], textarea[id*="${key}" i], textarea[name*="${key}" i]`
       );
 
       elements.forEach(el => {
