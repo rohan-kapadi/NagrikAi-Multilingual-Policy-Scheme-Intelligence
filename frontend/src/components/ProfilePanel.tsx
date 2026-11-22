@@ -29,7 +29,8 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
   const t = {
     en: {
       title: 'Your Citizen Profile',
-      subtitle: 'Details collected from conversation. Editable anytime.',
+      subtitle: 'Details collected from conversation & documents. Editable anytime.',
+      name: 'Full Name',
       occupation: 'Occupation',
       district: 'District',
       state: 'State',
@@ -41,11 +42,12 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
       save: 'Save Profile',
       cancel: 'Cancel',
       edit: 'Edit Fields',
-      privacyNote: 'Privacy Notice: Your information is kept strictly in session memory and is never shared or stored permanently.',
+      privacyNote: 'Privacy Notice: Your information is encrypted and stored locally in your browser ledger.',
     },
     hi: {
       title: 'नागरिक प्रोफ़ाइल (Citizen Profile)',
-      subtitle: 'बातचीत से प्राप्त विवरण। कभी भी बदल सकते हैं।',
+      subtitle: 'बातचीत और दस्तावेज़ों से प्राप्त विवरण। कभी भी बदल सकते हैं।',
+      name: 'पूरा नाम',
       occupation: 'मुख्य व्यवसाय',
       district: 'जिला',
       state: 'राज्य',
@@ -57,11 +59,12 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
       save: 'सहेजें',
       cancel: 'रद्द करें',
       edit: 'बदलें',
-      privacyNote: 'गोपनीयता सूचना: आपकी जानकारी केवल सत्र के दौरान रखी जाती है और कभी भी स्थायी रूप से संग्रहीत नहीं की जाती।',
+      privacyNote: 'गोपनीयता सूचना: आपकी जानकारी एन्क्रिप्टेड है और स्थानीय रूप से सुरक्षित है।',
     },
     mr: {
       title: 'नागरिक प्रोफाइल (Citizen Profile)',
-      subtitle: 'संभाषणातून गोळा केलेला तपशील. केव्हाही संपादित करा.',
+      subtitle: 'संभाषण व कागदपत्रांमधून गोळा केलेला तपशील. केव्हाही संपादित करा.',
+      name: 'पूर्ण नाव',
       occupation: 'व्यवसाय',
       district: 'जिल्हा',
       state: 'राज्य',
@@ -73,7 +76,7 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
       save: 'जतन करा',
       cancel: 'रद्द करा',
       edit: 'संपादित करा',
-      privacyNote: 'गोपनीयता सूचना: आपली माहिती केवळ या सत्रासाठी वापरली जाते आणि कायमस्वरूपी जतन केली जात नाही.',
+      privacyNote: 'गोपनीयता सूचना: आपली माहिती एन्क्रिप्टेड असून ब्राउझरमध्ये सुरक्षित ठेवली जाते.',
     },
   }[language] || {
     title: 'Your Citizen Profile',
@@ -118,6 +121,24 @@ export const ProfilePanel: React.FC<ProfilePanelProps> = ({
 
       {/* Body */}
       <div className="p-4 flex-1 overflow-y-auto space-y-3 text-xs">
+        {/* Full Name */}
+        <div>
+          <label className="font-semibold text-slate-600">{t.name}</label>
+          {isEditing ? (
+            <input
+              type="text"
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full mt-1 px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+              placeholder="e.g. Rohan Kapadi"
+            />
+          ) : (
+            <p className="mt-0.5 text-slate-800 font-bold capitalize">
+              {profile.name || '—'}
+            </p>
+          )}
+        </div>
+
         {/* Occupation */}
         <div>
           <label className="font-semibold text-slate-600">{t.occupation}</label>

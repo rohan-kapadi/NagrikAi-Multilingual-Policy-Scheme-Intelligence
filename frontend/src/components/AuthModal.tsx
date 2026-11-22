@@ -112,9 +112,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="px-6 pt-6 pb-4 flex items-start justify-between">
           <div>
             <div className="flex items-center space-x-2 mb-1">
-              <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                न
-              </div>
+              <img
+                src="/logo.png"
+                alt="NagrikAI Logo"
+                className="w-7 h-7 rounded-lg object-cover shadow-sm border border-slate-200"
+              />
               <span className="text-sm font-bold text-emerald-700">NagrikAI</span>
             </div>
             <h2 className="text-xl font-bold text-slate-900 mt-2">

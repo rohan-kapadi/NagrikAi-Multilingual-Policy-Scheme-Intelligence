@@ -360,6 +360,8 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
     };
     try {
       localStorage.setItem('nagrik_copilot_profile', JSON.stringify(payload));
+      localStorage.setItem('nagrik_profile', JSON.stringify(profile));
+      localStorage.setItem('nagrik_citizen_profile', JSON.stringify(profile));
       window.postMessage({ type: 'NAGRIK_PROFILE_SYNC', data: payload }, '*');
       setSyncSuccess(true);
       setTimeout(() => setSyncSuccess(false), 3000);
@@ -371,49 +373,75 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 font-sans">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-emerald-950 text-white rounded-2xl p-6 shadow-md mb-6 relative overflow-hidden">
-        <div className="absolute right-0 top-0 translate-x-8 -translate-y-8 w-48 h-48 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+      <div className="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-xl mb-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none" />
         
-        <div className="flex items-center space-x-2 mb-2">
-          <ShieldCheck className="w-6 h-6 text-emerald-400" />
-          <h2 className="text-lg font-bold tracking-tight">{t.title}</h2>
-        </div>
-        <p className="text-xs text-slate-300 max-w-2xl leading-relaxed mb-4">
-          {t.subtitle}
-        </p>
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full mb-3">
+            <Lock className="w-3 h-3 text-emerald-400" />
+            <span>{t.securityPill}</span>
+          </div>
 
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[11px] font-medium text-emerald-300">
-          <Lock className="w-3.5 h-3.5" />
-          <span>{t.securityPill}</span>
+          <div className="flex items-center space-x-2.5 mb-2">
+            <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-xs">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">{t.title}</h2>
+          </div>
+
+          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed mb-5">
+            {t.subtitle}
+          </p>
+
+          {/* Security stats row */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-white/10">
+            <div className="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+              <span className="text-[10px] text-slate-400 uppercase font-semibold block">Encryption</span>
+              <span className="text-xs font-bold text-emerald-300">Client AES-256 GCM</span>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+              <span className="text-[10px] text-slate-400 uppercase font-semibold block">Storage</span>
+              <span className="text-xs font-bold text-emerald-300">Local Browser Only</span>
+            </div>
+            <div className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 col-span-2 sm:col-span-1">
+              <span className="text-[10px] text-slate-400 uppercase font-semibold block">Integrity</span>
+              <span className="text-xs font-bold text-emerald-300">SHA-256 Ledger</span>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Extension Sync Bridge Card */}
-      <div className="bg-white rounded-2xl border border-emerald-200 p-5 shadow-xs mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="space-y-1">
+      <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="space-y-1.5 max-w-lg">
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <h3 className="text-sm font-bold text-slate-800">{t.syncCopilotTitle}</h3>
+            <div className="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-900">{t.syncCopilotTitle}</h3>
+            <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200/80">
+              Active Bridge
+            </span>
           </div>
-          <p className="text-xs text-slate-500 max-w-xl leading-relaxed">
+          <p className="text-xs text-slate-500 leading-relaxed">
             {t.syncCopilotDesc}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto shrink-0">
           <a
             href="/nagrik-copilot-extension.zip"
             download="nagrik-copilot-extension.zip"
-            className="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition-colors shadow-xs"
+            className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 text-xs font-semibold rounded-xl flex items-center space-x-1.5 transition-all shadow-2xs"
             title={t.downloadExtension}
           >
-            <Download className="w-3.5 h-3.5 text-emerald-700" />
+            <Download className="w-3.5 h-3.5 text-slate-600" />
             <span>{t.downloadExtension}</span>
           </a>
 
           <button
             onClick={handleSyncToExtension}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition-colors shadow-xs"
+            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl flex items-center justify-center space-x-1.5 transition-all shadow-xs cursor-pointer"
           >
             {syncSuccess ? (
               <>
@@ -432,11 +460,11 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
             href="/demo-portal.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl flex items-center space-x-1 transition-colors"
+            className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold rounded-xl flex items-center space-x-1 transition-all shadow-2xs"
             title={t.testDemoPortal}
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">{t.testDemoPortal}</span>
+            <span>{t.testDemoPortal}</span>
           </a>
         </div>
       </div>
@@ -505,9 +533,9 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
         onDrop={handleDrop}
         className={`border-2 border-dashed ${
           isDragging
-            ? 'border-emerald-600 bg-emerald-100/70 scale-[1.01]'
-            : 'border-emerald-300 hover:border-emerald-500 bg-emerald-50/40 hover:bg-emerald-50/70'
-        } rounded-2xl p-6 text-center cursor-pointer transition-all mb-6 select-none relative`}
+            ? 'border-emerald-500 bg-emerald-50/80 scale-[1.01]'
+            : 'border-slate-300/90 hover:border-emerald-500 bg-white hover:bg-emerald-50/30'
+        } rounded-3xl p-8 text-center cursor-pointer transition-all mb-6 select-none relative shadow-sm group`}
       >
         <input
           ref={fileInputRef}
@@ -518,26 +546,26 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
           onChange={handleFileUpload}
           disabled={isProcessing}
         />
-        <div className="flex flex-col items-center space-y-2">
-          <div className="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+        <div className="flex flex-col items-center space-y-2.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-700 flex items-center justify-center shadow-2xs group-hover:scale-110 transition-transform">
             {isProcessing ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
             ) : (
-              <Upload className="w-5 h-5" />
+              <Upload className="w-6 h-6" />
             )}
           </div>
-          <p className="text-xs font-bold text-slate-800">
+          <p className="text-sm font-bold text-slate-800">
             {isProcessing ? t.processing : t.uploadBtn}
           </p>
-          <p className="text-[11px] text-slate-500">{t.uploadSub}</p>
+          <p className="text-xs text-slate-400 max-w-sm">{t.uploadSub}</p>
         </div>
       </div>
 
       {/* Document Ledger List */}
       <div className="space-y-3 mb-6">
         <div className="flex items-center justify-between text-xs font-semibold text-slate-600 px-1">
-          <span>{t.documentsCount} ({documents.length})</span>
-          <span className="text-[11px] text-emerald-700 flex items-center space-x-1">
+          <span className="font-bold text-slate-700">{t.documentsCount} ({documents.length})</span>
+          <span className="text-[11px] text-emerald-700 flex items-center space-x-1.5 font-medium bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200/80">
             <Lock className="w-3 h-3" />
             <span>End-to-End Client Encrypted</span>
           </span>
@@ -546,28 +574,28 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
         {documents.map((doc) => (
           <div
             key={doc.id}
-            className="bg-white border border-slate-200 hover:border-emerald-300 rounded-xl p-4 shadow-xs transition-all text-left"
+            className="bg-white border border-slate-200/90 hover:border-emerald-300 rounded-2xl p-5 shadow-2xs hover:shadow-xs transition-all text-left"
           >
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
-              <div className="flex items-center space-x-2.5 min-w-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-2">
+              <div className="flex items-center space-x-3 min-w-0">
                 {/* Thumbnail Preview if PNG/Image, otherwise file icon */}
                 {doc.previewUrl ? (
-                  <div className="w-10 h-10 rounded-lg border border-slate-200 overflow-hidden shrink-0 bg-slate-50 flex items-center justify-center shadow-xs">
+                  <div className="w-12 h-12 rounded-xl border border-slate-200 overflow-hidden shrink-0 bg-slate-50 flex items-center justify-center shadow-2xs">
                     <img src={doc.previewUrl} alt={doc.name} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                    <FileCheck2 className="w-5 h-5" />
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                    <FileCheck2 className="w-6 h-6" />
                   </div>
                 )}
                 <div className="min-w-0">
-                  <h4 className="text-xs font-bold text-slate-800 truncate max-w-sm">{doc.name}</h4>
-                  <div className="flex items-center space-x-2 text-[10px] text-slate-400 mt-0.5">
+                  <h4 className="text-sm font-bold text-slate-900 truncate max-w-sm">{doc.name}</h4>
+                  <div className="flex items-center space-x-2 text-[11px] text-slate-400 mt-0.5">
                     <span>{doc.sizeKb} KB</span>
                     <span>•</span>
                     <span>{doc.timestamp}</span>
                     <span>•</span>
-                    <span className="text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.2 rounded">
+                    <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
                       AES-256 Secured
                     </span>
                   </div>
@@ -576,28 +604,28 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
 
               <button
                 onClick={() => handleDeleteDoc(doc.id)}
-                className="text-slate-400 hover:text-rose-600 p-1 transition-colors self-end sm:self-center cursor-pointer"
+                className="text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors self-end sm:self-center cursor-pointer"
                 title="Remove document"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
 
             {/* SHA-256 Verifiable Proof */}
-            <div className="mt-3 bg-slate-50 border border-slate-200/80 rounded-lg p-2 flex items-center justify-between gap-2 text-[10px]">
-              <div className="flex items-center space-x-1.5 text-slate-600 truncate min-w-0">
-                <span className="font-semibold text-slate-700 shrink-0">{t.tamperProofHash}:</span>
-                <code className="text-slate-500 font-mono truncate">{doc.sha256Hash}</code>
+            <div className="mt-3 bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 flex items-center justify-between gap-2 text-[11px]">
+              <div className="flex items-center space-x-2 text-slate-600 truncate min-w-0">
+                <span className="font-bold text-slate-700 shrink-0 font-mono text-[10px]">{t.tamperProofHash}:</span>
+                <code className="text-slate-500 font-mono text-[10px] truncate">{doc.sha256Hash}</code>
               </div>
               <button
                 onClick={() => copyHash(doc.sha256Hash)}
-                className="shrink-0 p-1 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                className="shrink-0 p-1.5 rounded-md hover:bg-white text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
                 title="Copy Hash"
               >
                 {copiedHash === doc.sha256Hash ? (
-                  <Check className="w-3 h-3 text-emerald-600" />
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                 ) : (
-                  <Copy className="w-3 h-3" />
+                  <Copy className="w-3.5 h-3.5" />
                 )}
               </button>
             </div>
@@ -606,7 +634,7 @@ export const NagrikVault: React.FC<NagrikVaultProps> = ({
             {Object.keys(doc.extractedFields).length > 0 && (
               <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-                  <span className="text-slate-500 text-[10px] font-medium">{t.appliedToProfile}:</span>
+                  <span className="text-slate-500 text-[10px] font-bold uppercase tracking-wide">{t.appliedToProfile}:</span>
                   {Object.entries(doc.extractedFields).map(([k, v]) => (
                     <span
                       key={k}

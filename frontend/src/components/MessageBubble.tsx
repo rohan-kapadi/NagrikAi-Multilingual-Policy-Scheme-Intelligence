@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bot, User, HelpCircle, Brain } from 'lucide-react';
+import { User, HelpCircle, Brain } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import type { ChatMessage } from '../types';
 import { SchemeCard } from './SchemeCard';
@@ -28,11 +28,11 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
       <div className={`flex max-w-2xl gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Avatar */}
         <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-semibold shadow-xs ${
-            isUser ? 'bg-slate-700' : 'bg-emerald-600'
+          className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-white text-xs font-semibold shadow-xs overflow-hidden ${
+            isUser ? 'bg-slate-700' : 'bg-slate-900 border border-slate-200'
           }`}
         >
-          {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+          {isUser ? <User className="w-4 h-4" /> : <img src="/logo.png" alt="NagrikAI" className="w-full h-full object-cover" />}
         </div>
 
         {/* Bubble body */}

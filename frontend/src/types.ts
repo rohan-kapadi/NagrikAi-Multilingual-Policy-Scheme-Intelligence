@@ -1,4 +1,5 @@
 export interface CitizenProfile {
+  name?: string | null;
   age?: number | null;
   gender?: string | null;
   state?: string | null;

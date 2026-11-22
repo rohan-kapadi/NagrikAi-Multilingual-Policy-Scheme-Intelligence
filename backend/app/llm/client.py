@@ -42,7 +42,7 @@ class LLMClient:
             ],
             "temperature": min(temperature, 0.2),  # enforce ≤ 0.2
             "response_format": {"type": "json_object"},
-            "max_tokens": 1024
+            "max_tokens": 2048
         }
         with httpx.Client(timeout=15.0) as client:
             resp = client.post(url, headers=headers, json=payload)
@@ -61,7 +61,7 @@ class LLMClient:
             "generationConfig": {
                 "temperature": min(temperature, 0.2),
                 "response_mime_type": "application/json",
-                "maxOutputTokens": 1024
+                "maxOutputTokens": 2048
             }
         }
         with httpx.Client(timeout=15.0) as client:
@@ -288,26 +288,33 @@ class LLMClient:
             return bool(self.gemini_api_key and self.gemini_api_key not in ("", "your_gemini_api_key_here"))
         return False
 
-    def generate_json(self, system_prompt: str, user_prompt: str, max_retries: int = 1) -> Dict[str, Any]:
+    def generate_json(
+        self,
+        system_prompt: str,
+        user_prompt: str = "",
+        user_message: Optional[str] = None,
+        max_retries: int = 1
+    ) -> Dict[str, Any]:
         """
         Executes prompt → returns parsed JSON dict.
         On parse failure: retries once then falls back to heuristic extractor.
         On no API key: immediately falls back to heuristic extractor.
         """
+        effective_user_prompt = user_prompt or user_message or ""
         has_groq = self._has_valid_key("groq")
         has_gemini = self._has_valid_key("gemini")
 
         if not (has_groq or has_gemini):
-            return self._heuristic_extract_profile(user_prompt)
+            return self._heuristic_extract_profile(effective_user_prompt)
 
         for attempt in range(max_retries + 1):
             try:
                 if has_groq and self.default_provider == "groq":
-                    raw = self._call_groq(system_prompt, user_prompt)
+                    raw = self._call_groq(system_prompt, effective_user_prompt)
                 elif has_gemini:
-                    raw = self._call_gemini(system_prompt, user_prompt)
+                    raw = self._call_gemini(system_prompt, effective_user_prompt)
                 else:
-                    raw = self._call_groq(system_prompt, user_prompt)
+                    raw = self._call_groq(system_prompt, effective_user_prompt)
 
                 # Strip markdown code fences if LLM ignores JSON mode instruction
                 clean = raw.strip()
@@ -320,9 +327,9 @@ class LLMClient:
                 logger.warning(f"LLM JSON attempt {attempt + 1}/{max_retries + 1} failed: {e}")
                 if attempt == max_retries:
                     logger.warning("All LLM attempts failed; falling back to heuristic extractor.")
-                    return self._heuristic_extract_profile(user_prompt)
+                    return self._heuristic_extract_profile(effective_user_prompt)
 
-        return self._heuristic_extract_profile(user_prompt)
+        return self._heuristic_extract_profile(effective_user_prompt)
 
 
 # Module-level singleton — imported by other pipeline modules

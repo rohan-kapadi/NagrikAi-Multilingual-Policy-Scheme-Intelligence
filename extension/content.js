@@ -6,7 +6,7 @@ function autofillForm(profile) {
   if (!profile) return 0;
 
   const fieldMatchers = [
-    { keys: ['applicant_name', 'fullname', 'name', 'farmer_name', 'student_name'], val: profile.name || 'Rohan Kapadnis' },
+    { keys: ['applicant_name', 'fullname', 'name', 'farmer_name', 'student_name'], val: profile.name || 'Rohan Kapadi' },
     { keys: ['occupation', 'profession', 'livelihood'], val: profile.occupation || 'farmer' },
     { keys: ['state', 'state_name'], val: profile.state || 'Maharashtra' },
     { keys: ['district', 'district_name'], val: profile.district || 'Pune' },
@@ -14,6 +14,7 @@ function autofillForm(profile) {
     { keys: ['annual_family_income', 'family_income', 'income', 'annual_income'], val: profile.annual_family_income || 180000 },
     { keys: ['caste_category', 'category', 'caste', 'social_category'], val: profile.caste_category || 'general' },
     { keys: ['residence', 'area_type', 'residential_area'], val: profile.residence || 'rural' },
+    { keys: ['education_level', 'education', 'qualification'], val: profile.education_level || '12th Pass' },
   ];
 
   let count = 0;
@@ -43,11 +44,11 @@ function autofillForm(profile) {
   });
 
   // Display floating notification banner
-  showConfirmationBanner(count);
+  showConfirmationBanner(`✓ Nagrik Copilot: ${count} fields autofilled from verified vault!`);
   return count;
 }
 
-function showConfirmationBanner(count) {
+function showConfirmationBanner(message) {
   const existing = document.getElementById('nagrik-copilot-banner');
   if (existing) existing.remove();
 
@@ -71,14 +72,50 @@ function showConfirmationBanner(count) {
     gap: 8px;
     animation: slideDown 0.3s ease-out;
   `;
-  banner.innerHTML = `
-    <span style="font-size: 16px;">✓</span>
-    <span>Nagrik Copilot: ${count} fields autofilled from verified vault!</span>
-  `;
+  banner.innerHTML = `<span>${message}</span>`;
 
   document.body.appendChild(banner);
   setTimeout(() => banner.remove(), 4000);
 }
+
+// ── Profile Sync Bridge ───────────────────────────────────────
+// Listen for postMessage from NagrikAI web portal
+window.addEventListener('message', (event) => {
+  if (!event.data) return;
+
+  if (event.data.type === 'NAGRIK_PROFILE_SYNC') {
+    const payload = event.data.data;
+    const profile = payload?.profile || payload;
+    if (profile && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({
+        nagrik_profile: profile,
+        nagrik_copilot_profile: payload,
+      }, () => {
+        console.log('Nagrik Copilot: Synced profile to extension storage!', profile);
+        showConfirmationBanner('✓ Nagrik Copilot: Profile synced to extension!');
+      });
+    }
+  }
+
+  if (event.data.type === 'NAGRIK_COPILOT_AUTOFILL') {
+    autofillForm(event.data.profile);
+  }
+});
+
+// Auto-sync from localStorage if running on NagrikAI domain
+try {
+  const localSync = localStorage.getItem('nagrik_copilot_profile') || localStorage.getItem('nagrik_citizen_profile');
+  if (localSync) {
+    const parsed = JSON.parse(localSync);
+    const prof = parsed.profile || parsed;
+    if (prof && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+      chrome.storage.local.set({
+        nagrik_profile: prof,
+        nagrik_copilot_profile: parsed,
+      });
+    }
+  }
+} catch (e) {}
 
 // Listen for message from popup
 if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
@@ -86,13 +123,16 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
     if (request.type === 'NAGRIK_COPILOT_AUTOFILL') {
       const filled = autofillForm(request.profile);
       sendResponse({ status: 'success', filledCount: filled });
+    } else if (request.type === 'NAGRIK_GET_PROFILE') {
+      try {
+        const stored = localStorage.getItem('nagrik_copilot_profile') || localStorage.getItem('nagrik_citizen_profile');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          sendResponse({ profile: parsed.profile || parsed });
+          return;
+        }
+      } catch (e) {}
+      sendResponse({ profile: null });
     }
   });
 }
-
-// Also listen for postMessage from demo portal
-window.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'NAGRIK_COPILOT_AUTOFILL') {
-    autofillForm(event.data.profile);
-  }
-});
