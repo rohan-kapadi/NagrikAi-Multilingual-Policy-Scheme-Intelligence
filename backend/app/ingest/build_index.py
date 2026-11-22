@@ -115,9 +115,11 @@ def build_and_index():
         
     print(f"Indexing {len(all_chunks)} chunks into ChromaDB...")
     model = get_embedding_model()
-    
-    # E5 models benefit from "passage: " prefix on documents
-    texts = [f"passage: {c['text']}" for c in all_chunks]
+
+    # all-MiniLM-L6-v2 does NOT need prefixes; E5 models do.
+    # Detect by model name from settings.
+    use_e5_prefix = "e5" in settings.EMBEDDING_MODEL.lower()
+    texts = [f"passage: {c['text']}" if use_e5_prefix else c['text'] for c in all_chunks]
     embeddings = model.encode(texts, normalize_embeddings=True).tolist()
     
     ids = [c["chunk_id"] for c in all_chunks]
@@ -149,7 +151,8 @@ def search_chunks(query: str, top_k: int = 3, scheme_id: Optional[str] = None) -
         
     model = get_embedding_model()
     # E5 models benefit from "query: " prefix on search queries
-    query_text = f"query: {query}"
+    use_e5_prefix = "e5" in settings.EMBEDDING_MODEL.lower()
+    query_text = f"query: {query}" if use_e5_prefix else query
     query_embedding = model.encode([query_text], normalize_embeddings=True).tolist()
     
     where_filter = {"scheme_id": scheme_id} if scheme_id else None

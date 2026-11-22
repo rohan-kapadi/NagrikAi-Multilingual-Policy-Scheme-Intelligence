@@ -4,7 +4,9 @@ services:
     env: python
     region: oregon
     plan: free
-    buildCommand: "pip install -r backend/requirements.txt && python -m backend.app.ingest.build_index"
+    # ChromaDB index is pre-built and committed to git.
+    # build_index is NOT run on Render to avoid OOM (512MB free tier).
+    buildCommand: "pip install -r backend/requirements.txt"
     startCommand: "uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: PYTHON_VERSION
@@ -17,6 +19,8 @@ services:
         value: llama-3.3-70b-versatile
       - key: GEMINI_MODEL
         value: gemini-1.5-flash
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
       - key: CORS_ORIGINS
         value: '["*"]'
       - key: GROQ_API_KEY

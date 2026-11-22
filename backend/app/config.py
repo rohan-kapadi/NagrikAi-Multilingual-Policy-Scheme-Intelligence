@@ -22,7 +22,9 @@ class Settings(BaseSettings):
     GEMINI_MODEL: str = "gemini-1.5-flash"
     
     # Embedding Settings
-    EMBEDDING_MODEL: str = "intfloat/multilingual-e5-base"
+    # Note: all-MiniLM-L6-v2 is ~90MB (fits Render 512MB free tier).
+    # multilingual-e5-base (~450MB) can be set via env var on paid plans.
+    EMBEDDING_MODEL: str = "all-MiniLM-L6-v2"
     CHROMA_PERSIST_DIR: str = "backend/data/chroma"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

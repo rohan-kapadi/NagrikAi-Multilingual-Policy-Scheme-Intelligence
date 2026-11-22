@@ -15,7 +15,10 @@ frontend/dist/
 frontend/.vite/
 
 # Chroma / Data persistence
-backend/data/chroma/
+# Pre-built index IS committed so Render doesn't need to re-run build_index (OOM risk).
+# To regenerate locally: python -m backend.app.ingest.build_index
+!backend/data/chroma/
+backend/data/chroma/*.log
 
 # Environment
 .env
